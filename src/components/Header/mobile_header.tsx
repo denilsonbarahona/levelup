@@ -131,15 +131,20 @@ const App = ({ currentMenu }) => {
             sx={{ py: "1rem" }}
             onClick={() => toggleDrawer(false)}
           >
-            <MenuLinkStyledButton
-              href={item.href}
-              dark={dark}
-            >
+            <MenuLinkStyledButton href={item.href} dark={dark}>
               {item.label}
             </MenuLinkStyledButton>
           </ListItem>
         </React.Fragment>
       ))}
+      <NavLink href="/" className="flex">
+        <button
+          className="mt-10 rounded-2xl bg-[#ff684b] px-20 py-2 text-3xl font-semibold"
+          type="button"
+        >
+          Access
+        </button>
+      </NavLink>
     </List>
   );
 
@@ -153,19 +158,12 @@ const App = ({ currentMenu }) => {
         justifyContent="space-between"
         alignItems="center"
       >
-        <NavLink
-          href="/"
-          className="flex"
-        >
+        <NavLink href="/" className="flex">
           <Box onClick={() => toggleDrawer(false)}>
             <Logo light={dark} />
           </Box>
         </NavLink>
-        <Stack
-          direction="row"
-          spacing="1.6rem"
-          alignItems="center"
-        >
+        <Stack direction="row" spacing="1.6rem" alignItems="center">
           {/* TODO: Box created to temporarily create placeholder space. Needs to be removed */}
           <Box sx={{ padding: "3.0rem" }}></Box>
           {/* Temporarily disasbled for MVP */}
@@ -180,6 +178,7 @@ const App = ({ currentMenu }) => {
           </Menu>
         </Stack>
       </NavStack>
+
       {open && (
         <Box
           sx={{

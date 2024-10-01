@@ -17,6 +17,7 @@ import { styled } from "@mui/material/styles";
 import TriangleDownSvg from "@/assets/svgs/common/header-triangle-down.svg";
 import Logo from "@/components/ScrollLogo";
 import WalletToolkit from "@/components/WalletToolkit";
+import Button from "@/components/Button";
 import useCheckViewport from "@/hooks/useCheckViewport";
 
 import { navigations } from "./constants";
@@ -226,10 +227,7 @@ const App = ({ currentMenu }) => {
 
   const renderSubMenuList = (children) => {
     return children.map((section, idx) => (
-      <SectionList
-        key={idx}
-        dark={dark}
-      >
+      <SectionList key={idx} dark={dark}>
         <Typography
           sx={{
             fontSize: "1.4rem",
@@ -284,7 +282,7 @@ const App = ({ currentMenu }) => {
               >
                 {subItem.label}
               </LinkStyledSubButton>
-            )
+            ),
           )}
       </SectionList>
     ));
@@ -306,7 +304,7 @@ const App = ({ currentMenu }) => {
           <SvgIcon
             className={cx(
               "expand-more",
-              item.key === checked && "expand-more-reverse"
+              item.key === checked && "expand-more-reverse",
             )}
             sx={{ fontSize: "0.9rem" }}
             component={TriangleDownSvg}
@@ -376,17 +374,11 @@ const App = ({ currentMenu }) => {
   };
 
   return (
-    <StyledBox
-      bgColor={navbarBg}
-      dark={dark}
-    >
+    <StyledBox bgColor={navbarBg} dark={dark}>
       <Container>
         <HeaderContainer>
           {/* Fixed NavLink to redirect to home page */}
-          <NavLink
-            href="/"
-            className="flex"
-          >
+          <NavLink href="/" className="flex">
             <Logo light={dark} />
           </NavLink>
           <Stack
@@ -397,9 +389,14 @@ const App = ({ currentMenu }) => {
             <Box>{renderNavigationList()}</Box>
           </Stack>
           {/* TODO: Box created to temporarily create placeholder space. Needs to be removed */}
-          <Box sx={{ padding: "3.0rem" }}></Box>
-          {/* Temporarily disabled in MVP */}
-          {/* <WalletToolkit dark={dark}></WalletToolkit> */}
+          <NavLink href="/" className="flex">
+            <button
+              className="rounded-2xl bg-[#ff684b] px-20 py-2 text-3xl font-semibold"
+              type="button"
+            >
+              Access
+            </button>
+          </NavLink>
         </HeaderContainer>
       </Container>
     </StyledBox>

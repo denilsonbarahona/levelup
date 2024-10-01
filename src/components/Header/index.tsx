@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import { NoSsr } from '@mui/base/NoSsr';
+import { NoSsr } from "@mui/base/NoSsr";
 
 import { AppBar, Slide } from "@mui/material";
 import useScrollTrigger from "@mui/material/useScrollTrigger";
@@ -14,8 +14,7 @@ import { navigations } from "./constants";
 import DesktopNav from "./desktop_header";
 import MobileNav from "./mobile_header";
 
-
-const AppBarStyled = styled(AppBar)(({theme}) => ({
+const AppBarStyled = styled(AppBar)(({ theme }) => ({
   boxShadow: "none",
   position: "sticky",
   backgroundColor: "transparent",

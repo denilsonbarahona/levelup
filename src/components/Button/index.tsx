@@ -2,7 +2,7 @@
 
 import { motion, useCycle } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { useMemo } from "react";
+import { useMemo, ReactNode } from "react";
 import { makeStyles } from "tss-react/mui";
 
 import {
@@ -24,7 +24,7 @@ interface ScrollButtonProps extends ButtonProps {
   disabled?: boolean;
   whiteButton?: boolean;
   download?: boolean;
-
+  icon?: ReactNode;
   // compatibility
   target?: string;
   rel?: string;
@@ -164,6 +164,7 @@ const Button = (props: ScrollButtonProps) => {
     children,
     whiteButton,
     isExternal,
+    icon,
     onClick,
     ...restProps
   } = props;
@@ -185,6 +186,12 @@ const Button = (props: ScrollButtonProps) => {
     return disabled;
   }, [loading, disabled]);
 
+  const sideIcon = useMemo(() => {
+    return (
+      icon ?? <SvgIcon component={ArrowRightIcon} inheritViewBox></SvgIcon>
+    );
+  }, [icon]);
+
   const handleHover = () => {
     setIsHover();
   };
@@ -193,10 +200,12 @@ const Button = (props: ScrollButtonProps) => {
     if (onClick) {
       onClick(e);
     }
-    if (isExternal) {
-      window.open(props.href, "_blank");
-    } else {
-      router.push(props.href as string);
+    if (props?.href) {
+      if (isExternal) {
+        window.open(props.href, "_blank");
+      } else {
+        router.push(props.href as string);
+      }
     }
   };
 
@@ -216,7 +225,7 @@ const Button = (props: ScrollButtonProps) => {
     >
       {!loading && (
         <IconButton classes={{ root: classes.icon }} component="span" disabled>
-          <SvgIcon component={ArrowRightIcon} inheritViewBox></SvgIcon>
+          {sideIcon}
         </IconButton>
       )}
       <motion.div
