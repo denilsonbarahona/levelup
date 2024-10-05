@@ -1,5 +1,6 @@
 "use client";
 
+import { signIn, signOut, useSession } from "next-auth/react";
 import { useState } from "react";
 import { styled } from "@mui/material";
 import Button from "@/components/Button";
@@ -20,6 +21,8 @@ const CardArticle = styled("article")(() => ({
 
 const Auth = () => {
   const [open, setOpen] = useState(false);
+  const { data: session } = useSession();
+  console.log(session, "sesion");
 
   return (
     <div className="mt-[-6.5rem] flex flex-col pb-2.5">
@@ -34,11 +37,13 @@ const Auth = () => {
             </div>
             <div className="mt-6 grid place-content-center">
               <Button
-                onClick={() => setOpen((prev) => !prev)}
+                // onClick={() => setOpen((prev) => !prev)}
+                onClick={() => signIn("github")}
                 icon={<GitHubIcon />}
               >
                 GitHub
               </Button>
+              <button onClick={() => signOut()}>cerrar</button>
             </div>
           </div>
         </CardArticle>
