@@ -1,6 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { GetServerSideProps } from "next";
+import { apiClient } from "@/utils/axios";
+import { useRouter } from "next/router";
 import SectionHeader from "@/components/SectionHeader";
 import { Tabs, Tab, Box } from "@mui/material";
 import { TabPanel, TabContext, TabList } from "@mui/lab";
@@ -8,7 +11,11 @@ import Wrapper from "@/components/Wrapper";
 
 import { OverView, Prize, MyProject, Rules, Submissions } from "./components";
 
-const Event = () => {
+const Event = ({ event }) => {
+
+  const router = useRouter();
+  const { id } = router.query;
+
   const [tab, setTab] = useState("1");
 
   return (
