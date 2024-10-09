@@ -70,7 +70,7 @@ const NewEvent = () => {
         .then(async () => {
           const response = await createEvent(payload);
           router.push(`/event/${response._id}`);
-          event.currentTarget.reset();
+          event?.currentTarget?.reset();
         })
         .catch(() => {
           handleOpenSnackBar();

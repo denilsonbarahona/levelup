@@ -70,17 +70,16 @@ const NewEvent = () => {
         access: form.get("access") as string,
       };
 
-      console.log(payload, "payload");
-
       eventSchema
         .parseAsync(payload)
         .then(async () => {
-          const response = await updateEvent(pathParams[3]?.trim(), {
+          await updateEvent(pathParams[3]?.trim(), {
             ...currentEvent,
             ...payload,
           } as Event);
-          router.push(`/event/${response._id}`);
-          event.currentTarget.reset();
+
+          router.push(`/event/${pathParams[3]?.trim()}`);
+          event?.currentTarget?.reset();
         })
         .catch((error) => {
           console.log(error);
@@ -113,7 +112,7 @@ const NewEvent = () => {
 
   if (isLoading) {
     return (
-      <div className="grid h-screen w-screen">
+      <div className="grid h-screen w-screen place-content-center">
         <CircularProgress />
       </div>
     );
