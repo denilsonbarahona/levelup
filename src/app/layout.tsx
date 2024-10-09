@@ -4,10 +4,10 @@ import React from "react";
 
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v13-appRouter";
 
-// import ScrollToTop from "@/components/ScrollToTop"
 import { DEFAULT_METADATA } from "@/constants/route";
 import RainbowProvider from "@/contexts/RainbowProvider";
 import SessionAuthProvider from "@/nextAuth/sessionProvider";
+import InterceptorProvider from "@/interceptorProvider/interceptorProvider";
 import ScrollThemeProvider from "@/theme";
 import { findCurrentRoute } from "@/utils/route";
 import { GoogleAnalytics } from "@next/third-parties/google";
@@ -90,7 +90,9 @@ export default function RootLayout({
         <AppRouterCacheProvider options={{ key: "css" }}>
           <ScrollThemeProvider>
             <RainbowProvider>
-              <SessionAuthProvider>{children}</SessionAuthProvider>
+              <SessionAuthProvider>
+                <InterceptorProvider>{children}</InterceptorProvider>
+              </SessionAuthProvider>
               <Analytics />
             </RainbowProvider>
           </ScrollThemeProvider>

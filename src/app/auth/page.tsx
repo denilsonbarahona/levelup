@@ -21,8 +21,6 @@ const CardArticle = styled("article")(() => ({
 
 const Auth = () => {
   const [open, setOpen] = useState(false);
-  const { data: session } = useSession();
-  console.log(session, "sesion");
 
   return (
     <div className="mt-[-6.5rem] flex flex-col pb-2.5">
