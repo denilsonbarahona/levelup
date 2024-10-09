@@ -1,12 +1,21 @@
 "use client";
 
+import { FormEvent, useCallback, useState } from "react";
 import SectionHeader from "@/components/SectionHeader";
 import { styled } from "@mui/material/styles";
 import Wrapper from "@/components/Wrapper";
-import { Input, Select, MenuItem, Box, Typography } from "@mui/material";
+import {
+  Input,
+  Select,
+  MenuItem,
+  Box,
+  Typography,
+  Snackbar,
+} from "@mui/material";
 import Button from "@mui/material/Button";
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-import { useTheme } from "@mui/material/styles";
+import { eventSchema } from "@/utils/zod";
+import { LOCATIONS, EVENT_STATUS, EVENT_ACCESS } from "@/constants";
+import { createEvent } from "@/services/event";
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -29,8 +38,43 @@ const CardArticle = styled("article")(() => ({
   marginTop: "4rem",
 }));
 
+/* https://api-scroll-level-up.vercel.app/projects/
+/register-project
+/get-projects
+/get-project/:id? */
+
 const NewEvent = () => {
-  const theme = useTheme();
+  const [openSnackBar, setOpenSnackBar] = useState(false);
+
+  const handleOpenSnackBar = useCallback(() => {
+    setOpenSnackBar((prev) => !prev);
+  }, [setOpenSnackBar]);
+
+  const handleOnSubmit = useCallback(
+    async (event: FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      const form = new FormData(event.currentTarget);
+      const payload = {
+        title: form.get("title"),
+        description: form.get("description"),
+        start_date: form.get("start_date"),
+        end_date: form.get("end_date"),
+        location: form.get("location"),
+        status: form.get("status"),
+        access: form.get("access"),
+      };
+
+      eventSchema
+        .parseAsync(payload)
+        .then(async () => {
+          const response = await createEvent(payload);
+        })
+        .catch((error) => {
+          handleOpenSnackBar();
+        });
+    },
+    [],
+  );
 
   return (
     <div className="mt-[-6.5rem] flex flex-col pb-2.5">
@@ -41,7 +85,10 @@ const NewEvent = () => {
       />
       <Wrapper>
         <CardArticle>
-          <form className="mx-auto grid w-full gap-5 py-5">
+          <form
+            onSubmit={handleOnSubmit}
+            className="mx-auto grid w-full gap-5 py-5"
+          >
             <div>
               <label className="block text-lg font-medium text-[#1E1E1E]">
                 Banner
@@ -70,26 +117,46 @@ const NewEvent = () => {
               <label className="block text-lg font-medium text-[#1E1E1E]">
                 Title
               </label>
-              <Input className="w-full" placeholder="Enter title" />
+              <Input
+                name="title"
+                id="title"
+                className="w-full"
+                placeholder="Enter title"
+              />
             </div>
             <div>
               <label className="block text-lg font-medium text-[#1E1E1E]">
                 Description
               </label>
-              <Input className="w-full" placeholder="Enter Description" />
+              <Input
+                name="description"
+                id="description"
+                className="w-full"
+                placeholder="Enter Description"
+              />
             </div>
             <div className="grid items-center gap-5 md:flex">
-              <div>
+              <div className="w-full">
                 <label className="block text-lg font-medium text-[#1E1E1E]">
                   Start date
                 </label>
-                <Input type="date" className="w-full" />
+                <Input
+                  name="start_date"
+                  id="start_date"
+                  type="date"
+                  className="w-full"
+                />
               </div>
-              <div>
+              <div className="w-full">
                 <label className="block text-lg font-medium text-[#1E1E1E]">
                   End date
                 </label>
-                <Input type="date" className="w-full" />
+                <Input
+                  name="end_date"
+                  id="end_date"
+                  type="date"
+                  className="w-full"
+                />
               </div>
             </div>
             <div>
@@ -101,52 +168,34 @@ const NewEvent = () => {
                   width: "100%",
                   padding: "0rem",
                 }}
+                name="location"
+                id="location"
               >
-                <MenuItem
-                  sx={{ paddingInline: ["0rem"] }}
-                  className="!bg-white"
-                >
-                  <Box display="flex" paddingInline="24px" alignItems="center">
-                    <Typography
-                      sx={{
-                        fontSize: ["1.6rem", "2rem"],
-                        lineHeight: ["2.4rem", "3.6rem"],
-                        fontWeight: 600,
-                        cursor: "inherit",
-                      }}
+                {LOCATIONS.map((item) => (
+                  <MenuItem
+                    sx={{ paddingLeft: ["0rem"] }}
+                    className="!bg-white"
+                    key={item}
+                    value={item}
+                  >
+                    <Box
+                      display="flex"
+                      paddingInline="24px"
+                      alignItems="center"
                     >
-                      item
-                    </Typography>
-                  </Box>
-                </MenuItem>
-                <MenuItem sx={{ paddingLeft: ["0rem"] }} className="!bg-white">
-                  <Box display="flex" paddingInline="24px" alignItems="center">
-                    <Typography
-                      sx={{
-                        fontSize: ["1.6rem", "2rem"],
-                        lineHeight: ["2.4rem", "3.6rem"],
-                        fontWeight: 600,
-                        cursor: "inherit",
-                      }}
-                    >
-                      item
-                    </Typography>
-                  </Box>
-                </MenuItem>
-                <MenuItem sx={{ paddingLeft: ["0rem"] }} className="!bg-white">
-                  <Box display="flex" paddingInline="24px" alignItems="center">
-                    <Typography
-                      sx={{
-                        fontSize: ["1.6rem", "2rem"],
-                        lineHeight: ["2.4rem", "3.6rem"],
-                        fontWeight: 600,
-                        cursor: "inherit",
-                      }}
-                    >
-                      item
-                    </Typography>
-                  </Box>
-                </MenuItem>
+                      <Typography
+                        sx={{
+                          fontSize: ["1.6rem", "2rem"],
+                          lineHeight: ["2.4rem", "3.6rem"],
+                          fontWeight: 600,
+                          cursor: "inherit",
+                        }}
+                      >
+                        {item}
+                      </Typography>
+                    </Box>
+                  </MenuItem>
+                ))}
               </Select>
             </div>
             <div>
@@ -154,56 +203,38 @@ const NewEvent = () => {
                 Status
               </label>
               <Select
+                name="status"
+                id="status"
                 sx={{
                   width: "100%",
                   padding: "0rem",
                 }}
               >
-                <MenuItem
-                  sx={{ paddingInline: ["0rem"] }}
-                  className="!bg-white"
-                >
-                  <Box display="flex" paddingInline="24px" alignItems="center">
-                    <Typography
-                      sx={{
-                        fontSize: ["1.6rem", "2rem"],
-                        lineHeight: ["2.4rem", "3.6rem"],
-                        fontWeight: 600,
-                        cursor: "inherit",
-                      }}
+                {EVENT_STATUS.map((item) => (
+                  <MenuItem
+                    sx={{ paddingLeft: ["0rem"] }}
+                    className="!bg-white"
+                    key={item}
+                    value={item}
+                  >
+                    <Box
+                      display="flex"
+                      paddingInline="24px"
+                      alignItems="center"
                     >
-                      item
-                    </Typography>
-                  </Box>
-                </MenuItem>
-                <MenuItem sx={{ paddingLeft: ["0rem"] }} className="!bg-white">
-                  <Box display="flex" paddingInline="24px" alignItems="center">
-                    <Typography
-                      sx={{
-                        fontSize: ["1.6rem", "2rem"],
-                        lineHeight: ["2.4rem", "3.6rem"],
-                        fontWeight: 600,
-                        cursor: "inherit",
-                      }}
-                    >
-                      item
-                    </Typography>
-                  </Box>
-                </MenuItem>
-                <MenuItem sx={{ paddingLeft: ["0rem"] }} className="!bg-white">
-                  <Box display="flex" paddingInline="24px" alignItems="center">
-                    <Typography
-                      sx={{
-                        fontSize: ["1.6rem", "2rem"],
-                        lineHeight: ["2.4rem", "3.6rem"],
-                        fontWeight: 600,
-                        cursor: "inherit",
-                      }}
-                    >
-                      item
-                    </Typography>
-                  </Box>
-                </MenuItem>
+                      <Typography
+                        sx={{
+                          fontSize: ["1.6rem", "2rem"],
+                          lineHeight: ["2.4rem", "3.6rem"],
+                          fontWeight: 600,
+                          cursor: "inherit",
+                        }}
+                      >
+                        {item}
+                      </Typography>
+                    </Box>
+                  </MenuItem>
+                ))}
               </Select>
             </div>
             <div>
@@ -211,56 +242,38 @@ const NewEvent = () => {
                 Access
               </label>
               <Select
+                id="access"
+                name="access"
                 sx={{
                   width: "100%",
                   padding: "0rem",
                 }}
               >
-                <MenuItem
-                  sx={{ paddingInline: ["0rem"] }}
-                  className="!bg-white"
-                >
-                  <Box display="flex" paddingInline="24px" alignItems="center">
-                    <Typography
-                      sx={{
-                        fontSize: ["1.6rem", "2rem"],
-                        lineHeight: ["2.4rem", "3.6rem"],
-                        fontWeight: 600,
-                        cursor: "inherit",
-                      }}
+                {EVENT_ACCESS.map((item) => (
+                  <MenuItem
+                    sx={{ paddingLeft: ["0rem"] }}
+                    className="!bg-white"
+                    key={item}
+                    value={item}
+                  >
+                    <Box
+                      display="flex"
+                      paddingInline="24px"
+                      alignItems="center"
                     >
-                      item
-                    </Typography>
-                  </Box>
-                </MenuItem>
-                <MenuItem sx={{ paddingLeft: ["0rem"] }} className="!bg-white">
-                  <Box display="flex" paddingInline="24px" alignItems="center">
-                    <Typography
-                      sx={{
-                        fontSize: ["1.6rem", "2rem"],
-                        lineHeight: ["2.4rem", "3.6rem"],
-                        fontWeight: 600,
-                        cursor: "inherit",
-                      }}
-                    >
-                      item
-                    </Typography>
-                  </Box>
-                </MenuItem>
-                <MenuItem sx={{ paddingLeft: ["0rem"] }} className="!bg-white">
-                  <Box display="flex" paddingInline="24px" alignItems="center">
-                    <Typography
-                      sx={{
-                        fontSize: ["1.6rem", "2rem"],
-                        lineHeight: ["2.4rem", "3.6rem"],
-                        fontWeight: 600,
-                        cursor: "inherit",
-                      }}
-                    >
-                      item
-                    </Typography>
-                  </Box>
-                </MenuItem>
+                      <Typography
+                        sx={{
+                          fontSize: ["1.6rem", "2rem"],
+                          lineHeight: ["2.4rem", "3.6rem"],
+                          fontWeight: 600,
+                          cursor: "inherit",
+                        }}
+                      >
+                        {item}
+                      </Typography>
+                    </Box>
+                  </MenuItem>
+                ))}
               </Select>
             </div>
 
@@ -270,6 +283,17 @@ const NewEvent = () => {
           </form>
         </CardArticle>
       </Wrapper>
+      <Snackbar
+        open={openSnackBar}
+        autoHideDuration={6000}
+        onClose={handleOpenSnackBar}
+        sx={{
+          "& .MuiSnackbarContent-root": {
+            fontSize: "1.5rem",
+          },
+        }}
+        message="You should enter valid data"
+      />
     </div>
   );
 };

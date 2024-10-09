@@ -1,6 +1,22 @@
 export * from "./common";
 export * from "./networks";
 
+export const LOCATIONS = [
+  "America/New_York",
+  "America/Los_Angeles",
+  "America/Chicago",
+  "Europe/London",
+  "Europe/Berlin",
+  "Asia/Tokyo",
+  "Asia/Singapore",
+  "Australia/Sydney",
+  "America/Mexico_City",
+];
+
+export const EVENT_STATUS = ["UPCOMING", "OPEN", "ENDED"];
+
+export const EVENT_ACCESS = ["FREE", "INVITE ONLY"];
+
 export const HACKATHON_DATE_LIST = ["All time", "Upcoming", "Ended"];
 export const HACKATHON_REGION_LIST = [
   "All regions",
