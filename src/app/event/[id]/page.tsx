@@ -5,6 +5,7 @@ import SectionHeader from "@/components/SectionHeader";
 import { Tabs, Tab, Box } from "@mui/material";
 import { TabPanel, TabContext, TabList } from "@mui/lab";
 import Wrapper from "@/components/Wrapper";
+import { withAuth } from "@/components/HOC/withAuth";
 
 import { OverView, Prize } from "./components";
 
@@ -38,4 +39,4 @@ const Event = () => {
   );
 };
 
-export default Event;
+export default withAuth(Event);

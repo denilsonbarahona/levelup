@@ -52,7 +52,6 @@ const CodeEditor = ({
       alert("Incorrect, let's try again!");
       onSubmission(false);
     }
-    console.log("key", key);
   };
 
   useEffect(() => {
@@ -65,7 +64,7 @@ const CodeEditor = ({
   }, []);
 
   return (
-    <div className="rounded-xl resize-y overflow-hidden">
+    <div className="resize-y overflow-hidden rounded-xl">
       <Editor
         key={key}
         height={editorHeight}

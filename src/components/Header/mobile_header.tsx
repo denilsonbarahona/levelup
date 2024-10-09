@@ -1,5 +1,7 @@
+import { signOut, useSession } from "next-auth/react";
 import { default as NavLink } from "next/link";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
+import { usePathname } from "next/navigation";
 
 import { Box, List, ListItemButton, Stack } from "@mui/material";
 import { styled } from "@mui/system";
@@ -94,12 +96,19 @@ const MenuLinkStyledButton = styled<any>(NavLink, {
 }));
 
 const App = ({ currentMenu }) => {
+  const { data: session } = useSession();
+  const pathName = usePathname();
   const navbarBg = useCheckCustomNavBarBg();
   const showWalletConnector = useShowWalletConnector();
 
   const dark = useCheckTheme();
   const [open, setOpen] = useState(false);
   const [activeCollapse, setActiveCollapse] = useState("");
+
+  const isAdmin = useMemo(() => {
+    const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL?.split(",");
+    return adminEmail?.includes(session?.user?.email as string);
+  }, [session?.user]);
 
   useEffect(() => {
     setActiveCollapse(currentMenu);
@@ -125,26 +134,42 @@ const App = ({ currentMenu }) => {
     >
       {navigations.map((item) => (
         <React.Fragment key={item.key}>
-          <ListItem
-            dark={dark}
-            className={activeCollapse === item.key ? "active" : ""}
-            sx={{ py: "1rem" }}
-            onClick={() => toggleDrawer(false)}
-          >
-            <MenuLinkStyledButton href={item.href} dark={dark}>
-              {item.label}
-            </MenuLinkStyledButton>
-          </ListItem>
+          {(item.key === "event" && isAdmin) ||
+            (item.key !== "event" && (
+              <ListItem
+                dark={dark}
+                className={activeCollapse === item.key ? "active" : ""}
+                sx={{ py: "1rem" }}
+                onClick={() => toggleDrawer(false)}
+              >
+                <MenuLinkStyledButton href={item.href} dark={dark}>
+                  {item.label}
+                </MenuLinkStyledButton>
+              </ListItem>
+            ))}
         </React.Fragment>
       ))}
-      <NavLink href="/" className="flex">
+
+      {session?.user?.name && (
         <button
-          className="mt-10 rounded-2xl bg-[#ff684b] px-20 py-2 text-3xl font-semibold"
+          className="rounded-2xl bg-[#ff684b] px-20 py-2 text-3xl font-semibold"
           type="button"
+          onClick={() => signOut()}
         >
-          Access
+          LogOut
         </button>
-      </NavLink>
+      )}
+
+      {pathName !== "/auth" && !session?.user?.name && (
+        <NavLink href="/auth" className="flex">
+          <button
+            className="rounded-2xl bg-[#ff684b] px-20 py-2 text-3xl font-semibold"
+            type="button"
+          >
+            Access
+          </button>
+        </NavLink>
+      )}
     </List>
   );
 

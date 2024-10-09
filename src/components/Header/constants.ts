@@ -31,6 +31,11 @@ const navigations = [
     key: "grants",
     href: "https://tally.so/r/mYdQP5",
   },
+  {
+    label: "Create Event",
+    key: "event",
+    href: "/event",
+  },
 ];
 
 export { navigations };

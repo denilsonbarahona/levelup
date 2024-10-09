@@ -33,18 +33,15 @@ const IdeComponent = ({ exercise, setCompletedExercise }) => {
   }
 
   const submissionHandler = (isCorrect: boolean) => {
-    console.log("isCorrect", isCorrect);
     if (isCorrect) {
       setCompletedExercise((prevCompletedExercise) => {
         const currentExerciseNumber = parseInt(
-          exercise.replace("exercise", "")
+          exercise.replace("exercise", ""),
         );
-        console.log("current exercise:", currentExerciseNumber);
         if (currentExerciseNumber > prevCompletedExercise) {
           setCompletedExerciseNumber(currentExerciseNumber);
           return currentExerciseNumber;
         }
-        console.log("previous exercise:", prevCompletedExercise);
         return prevCompletedExercise;
       });
       setSolutionViewer(false);
@@ -81,15 +78,8 @@ const IdeComponent = ({ exercise, setCompletedExercise }) => {
       />
       {showSolutionButton ? (
         <Box position="relative">
-          <DiffEditorComponent
-            code={code}
-            codeSolution={codeSolution}
-          />
-          <Box
-            position="absolute"
-            left={4}
-            bottom={4}
-          >
+          <DiffEditorComponent code={code} codeSolution={codeSolution} />
+          <Box position="absolute" left={4} bottom={4}>
             <Tooltip title="Back to code">
               <Button
                 onClick={() => handleSolutionButtonClick(false)}
@@ -116,11 +106,7 @@ const IdeComponent = ({ exercise, setCompletedExercise }) => {
               submissionHandler(isCorrect);
             }}
           />
-          <Box
-            position="absolute"
-            left={4}
-            bottom={4}
-          >
+          <Box position="absolute" left={4} bottom={4}>
             {solutionViewer && (
               <Tooltip title="Tip: You can only view this solution once">
                 <Button
@@ -137,11 +123,7 @@ const IdeComponent = ({ exercise, setCompletedExercise }) => {
               </Tooltip>
             )}
           </Box>
-          <Box
-            position="absolute"
-            right={4}
-            bottom={4}
-          >
+          <Box position="absolute" right={4} bottom={4}>
             <SubmitButton
               code={code}
               codeSolution={codeSolution}

@@ -1,5 +1,7 @@
+import { signOut, useSession } from "next-auth/react";
 import { default as NavLink } from "next/link";
-import React, { useState } from "react";
+import { usePathname } from "next/navigation";
+import React, { useState, useMemo } from "react";
 import { useStyles } from "tss-react/mui";
 
 import {
@@ -207,6 +209,8 @@ const LinkStyledSubButton = styled<any>(NavLink, {
 
 const App = ({ currentMenu }) => {
   const { cx } = useStyles();
+  const { data: session } = useSession();
+  const pathName = usePathname();
   const navbarBg = useCheckCustomNavBarBg();
   const { isDesktop } = useCheckViewport();
   const dark = useCheckTheme();
@@ -214,6 +218,11 @@ const App = ({ currentMenu }) => {
   const [checked, setChecked] = useState("");
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+  const isAdmin = useMemo(() => {
+    const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL?.split(",");
+    return adminEmail?.includes(session?.user?.email as string);
+  }, [session?.user]);
 
   const handleMouseEnter = (e, key) => {
     setChecked(key);
@@ -341,7 +350,7 @@ const App = ({ currentMenu }) => {
           {item.label}
         </MenuLinkButton>
       );
-    } else {
+    } else if ((item.key === "event" && isAdmin) || item.key !== "event") {
       return (
         <LinkStyledButton
           className={currentMenu === item.key ? "active" : ""}
@@ -388,15 +397,27 @@ const App = ({ currentMenu }) => {
           >
             <Box>{renderNavigationList()}</Box>
           </Stack>
-          {/* TODO: Box created to temporarily create placeholder space. Needs to be removed */}
-          <NavLink href="/" className="flex">
+
+          {session?.user?.name && (
             <button
               className="rounded-2xl bg-[#ff684b] px-20 py-2 text-3xl font-semibold"
               type="button"
+              onClick={() => signOut()}
             >
-              Access
+              LogOut
             </button>
-          </NavLink>
+          )}
+
+          {pathName !== "/auth" && !session?.user?.name && (
+            <NavLink href="/auth" className="flex">
+              <button
+                className="rounded-2xl bg-[#ff684b] px-20 py-2 text-3xl font-semibold"
+                type="button"
+              >
+                Access
+              </button>
+            </NavLink>
+          )}
         </HeaderContainer>
       </Container>
     </StyledBox>

@@ -25,10 +25,8 @@ const Modal = ({ isOpen, isClose, children, code }: ModalProps) => {
       .then((res) => res.json())
       .then((data) => {
         setData(data);
-        console.log("data: ", data);
         const object = data.find((item) => item.id === slugParam);
         setName(object ? object.name : null);
-        console.log("name: ", name);
       });
   }, []);
 

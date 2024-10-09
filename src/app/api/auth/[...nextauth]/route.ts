@@ -7,7 +7,7 @@ const handler = NextAuth({
     GithubProvider({
       clientId: process.env.NEXT_PUBLIC_CLIENT_ID as string,
       clientSecret: process.env.NEXT_PUBLIC_CLIENT_SECRET as string,
-      authorization: { params: { scope: "repo read:user" } },
+      authorization: { params: { scope: "repo read:user user:email" } },
     }),
   ],
   session: {
@@ -18,7 +18,6 @@ const handler = NextAuth({
   },
   callbacks: {
     async jwt({ token, account, user }) {
-      console.log(token, account, user, "token");
       if (account) {
         token.accessToken = account.access_token;
         token.id = user.id;
