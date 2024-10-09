@@ -33,7 +33,7 @@ const Auth = () => {
               Authenticate
             </h1>
             <div className="mt-4 text-center text-[1.6rem] tracking-wide text-stone-950 max-md:leading-[24px]">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit,
+              Login with Github!
             </div>
             <div className="mt-6 grid place-content-center">
               <Button
@@ -43,7 +43,7 @@ const Auth = () => {
               >
                 GitHub
               </Button>
-              <button onClick={() => signOut()}>cerrar</button>
+              <button onClick={() => signOut()} />
             </div>
           </div>
         </CardArticle>

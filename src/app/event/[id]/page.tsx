@@ -6,7 +6,7 @@ import { Tabs, Tab, Box } from "@mui/material";
 import { TabPanel, TabContext, TabList } from "@mui/lab";
 import Wrapper from "@/components/Wrapper";
 
-import { OverView, Prize } from "./components";
+import { OverView, Prize, MyProject, Rules, Submissions } from "./components";
 
 const Event = () => {
   const [tab, setTab] = useState("1");
@@ -29,9 +29,15 @@ const Event = () => {
           <TabPanel value="2">
             <Prize />
           </TabPanel>
-          <TabPanel value="3">Item Four</TabPanel>
-          <TabPanel value="4">Item Five</TabPanel>
-          <TabPanel value="5">Item Six</TabPanel>
+          <TabPanel value="3">
+            <Submissions />
+          </TabPanel>
+          <TabPanel value="4">
+            <Rules />
+          </TabPanel>
+          <TabPanel value="5">
+            <MyProject />
+          </TabPanel>
         </TabContext>
       </Wrapper>
     </div>
