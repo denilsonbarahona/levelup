@@ -1,9 +1,10 @@
 "use client";
 
-import { FormEvent, useCallback, useState } from "react";
-import { useRouter } from "next/navigation";
+import { FormEvent, useCallback, useState, useEffect } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import SectionHeader from "@/components/SectionHeader";
 import { styled } from "@mui/material/styles";
+import { Event } from "@/types/events";
 import Wrapper from "@/components/Wrapper";
 import {
   Input,
@@ -17,7 +18,7 @@ import {
 import Button from "@mui/material/Button";
 import { eventSchema } from "@/utils/zod";
 import { LOCATIONS, EVENT_STATUS, EVENT_ACCESS } from "@/constants";
-import { createEvent } from "@/services/event";
+import { getEventById, updateEvent } from "@/services/event";
 import { withAuth } from "@/components/HOC/withAuth";
 
 const VisuallyHiddenInput = styled("input")({
@@ -43,7 +44,10 @@ const CardArticle = styled("article")(() => ({
 
 const NewEvent = () => {
   const router = useRouter();
+  const pathName = usePathname();
+  const [isLoading, setIsLoading] = useState(true);
   const [openSnackBar, setOpenSnackBar] = useState(false);
+  const [currentEvent, setCurrentEvent] = useState<Event>();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleOpenSnackBar = useCallback(() => {
@@ -54,25 +58,31 @@ const NewEvent = () => {
     async (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();
       setIsSubmitting(true);
+      const pathParams = pathName.split("/");
       const form = new FormData(event.currentTarget);
       const payload = {
-        title: form.get("title"),
-        description: form.get("description"),
-        start_date: form.get("start_date"),
-        end_date: form.get("end_date"),
-        location: form.get("location"),
-        status: form.get("status"),
-        access: form.get("access"),
+        title: form.get("title") as string,
+        description: form.get("description") as string,
+        start_date: form.get("start_date") as string,
+        end_date: form.get("end_date") as string,
+        location: form.get("location") as string,
+        status: form.get("status") as string,
+        access: form.get("access") as string,
       };
 
       eventSchema
         .parseAsync(payload)
         .then(async () => {
-          const response = await createEvent(payload);
-          router.push(`/event/${response._id}`);
+          await updateEvent(pathParams[3]?.trim(), {
+            ...currentEvent,
+            ...payload,
+          } as Event);
+
+          router.push(`/event/${pathParams[3]?.trim()}`);
           event?.currentTarget?.reset();
         })
-        .catch(() => {
+        .catch((error) => {
+          console.log(error);
           handleOpenSnackBar();
         })
         .finally(() => {
@@ -82,11 +92,37 @@ const NewEvent = () => {
     [],
   );
 
+  const handleGettingEventById = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      if (!currentEvent) {
+        const pathParams = pathName.split("/");
+        const event = await getEventById(pathParams[3]?.trim());
+        setCurrentEvent(event);
+      }
+    } catch {
+    } finally {
+      setIsLoading(false);
+    }
+  }, [currentEvent]);
+
+  useEffect(() => {
+    handleGettingEventById();
+  }, [[handleGettingEventById]]);
+
+  if (isLoading) {
+    return (
+      <div className="grid h-screen w-screen place-content-center">
+        <CircularProgress />
+      </div>
+    );
+  }
+
   return (
     <div className="mt-[-6.5rem] flex flex-col pb-2.5">
       <SectionHeader
         backgroundColor="#FFF8F3"
-        title="Create hackathon"
+        title="Edit hackathon"
         url={"/images/podcast-banner.svg"}
       />
       <Wrapper>
@@ -123,6 +159,7 @@ const NewEvent = () => {
                 name="title"
                 id="title"
                 className="w-full"
+                defaultValue={currentEvent?.title}
                 placeholder="Enter title"
               />
             </div>
@@ -134,6 +171,7 @@ const NewEvent = () => {
                 name="description"
                 id="description"
                 className="w-full"
+                defaultValue={currentEvent?.description}
                 placeholder="Enter Description"
               />
             </div>
@@ -146,6 +184,7 @@ const NewEvent = () => {
                   name="start_date"
                   id="start_date"
                   type="date"
+                  defaultValue={currentEvent?.start_date?.split("T")?.[0]}
                   className="w-full"
                 />
               </div>
@@ -157,6 +196,7 @@ const NewEvent = () => {
                   name="end_date"
                   id="end_date"
                   type="date"
+                  defaultValue={currentEvent?.end_date?.split("T")?.[0]}
                   className="w-full"
                 />
               </div>
@@ -172,6 +212,7 @@ const NewEvent = () => {
                 }}
                 name="location"
                 id="location"
+                defaultValue={currentEvent?.location}
               >
                 {LOCATIONS.map((item) => (
                   <MenuItem
@@ -207,7 +248,7 @@ const NewEvent = () => {
               <Select
                 name="status"
                 id="status"
-                defaultValue="UPCOMING"
+                defaultValue={currentEvent?.status}
                 sx={{
                   width: "100%",
                   padding: "0rem",
@@ -247,7 +288,7 @@ const NewEvent = () => {
               <Select
                 id="access"
                 name="access"
-                defaultValue="FREE"
+                defaultValue={currentEvent?.access}
                 sx={{
                   width: "100%",
                   padding: "0rem",

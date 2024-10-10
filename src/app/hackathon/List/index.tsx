@@ -1,13 +1,14 @@
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useCallback } from "react";
 
 import { Box } from "@mui/material";
 import { styled } from "@mui/system";
 import useScrollTrigger from "@mui/material/useScrollTrigger";
 import HackathonCard from "./HackathonCard";
 import AdaptableComponent from "./AdaptableSelect";
-import Data from "./../hackathonList.json";
+import { getEvents } from "@/services/event";
+import { Event } from "@/types/events";
 import {
   HACKATHON_DATE_LIST,
   HACKATHON_REGION_LIST,
@@ -27,7 +28,9 @@ const CardBox = styled(Box)(() => ({
 
 const List = () => {
   const trigger = useScrollTrigger();
-  const [filteredData, setFilteredData] = useState(Data);
+  // const [filteredData, setFilteredData] = useState(Data);
+  const [filteredData, setFilteredData] = useState<Event[]>([]);
+  const [EventsData, setEventData] = useState<Event[]>([]);
   const [dateParams, setDateParams] = useState({
     category: "All time",
     level: HACKATHON_DATE_LIST[0],
@@ -42,17 +45,31 @@ const List = () => {
     [trigger],
   );
 
+  const handleGetEvents = useCallback(async () => {
+    try {
+      const events = await getEvents();
+      setEventData(events);
+      setFilteredData(events);
+    } catch {
+      console.log("error");
+    }
+  }, []);
+
   useEffect(() => {
-    const levelInfo = Data.filter((item) => {
+    const levelInfo = EventsData.filter((item) => {
       return (
-        (item.status.includes(dateParams.level) ||
-          dateParams.level === "All time") &&
-        (item.region.includes(regionParams.level) ||
+        (item.status?.includes(dateParams.level) ||
+          dateParams.level === "ALL TIME") &&
+        (item.location?.includes(regionParams.level) ||
           regionParams.level === "All regions")
       );
     });
     setFilteredData(levelInfo);
   }, [dateParams, regionParams]);
+
+  useEffect(() => {
+    handleGetEvents();
+  }, [handleGetEvents]);
 
   const handleChangeDate = (value) => {
     setDateParams((pre) => ({

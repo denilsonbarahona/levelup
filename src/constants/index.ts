@@ -17,17 +17,18 @@ export const EVENT_STATUS = ["UPCOMING", "OPEN", "ENDED"];
 
 export const EVENT_ACCESS = ["FREE", "INVITE ONLY"];
 
-export const HACKATHON_DATE_LIST = ["All time", "Upcoming", "Ended"];
+export const HACKATHON_DATE_LIST = ["ALL TIME", "UPCOMING", "OPEN", "ENDED"];
 export const HACKATHON_REGION_LIST = [
   "All regions",
-  "Africa",
-  "Asia Pacific",
-  "Central America",
-  "Europe",
-  "Middle East",
-  "North America",
-  "South America",
-  "South East Asia",
+  "America/New_York",
+  "America/Los_Angeles",
+  "America/Chicago",
+  "Europe/London",
+  "Europe/Berlin",
+  "Asia/Tokyo",
+  "Asia/Singapore",
+  "Australia/Sydney",
+  "America/Mexico_City",
 ];
 export const CHALLENGE_LEVEL_LIST = [
   "All levels",

@@ -1,8 +1,12 @@
+import { useMemo } from "react";
+import { format, isSameMonth, parseISO } from "date-fns";
+import { useSession } from "next-auth/react";
 import { Box, Typography, styled } from "@mui/material";
 import Image from "next/image";
 import Button from "@/components/Button";
 import useCheckViewport from "@/hooks/useCheckViewport";
 import { sendGAEvent } from "@next/third-parties/google";
+import { Event } from "@/types/events";
 
 const CardArticle = styled("article")(({ theme }) => ({
   background: "#FFF0DD",
@@ -58,8 +62,26 @@ const Label = styled(Typography)(({ theme }) => ({
   },
 }));
 
-const HackathonCard = ({ content }) => {
+const HackathonCard = ({ content }: { content: Event }) => {
+  const { data: session } = useSession();
+  const isAdmin = useMemo(() => {
+    const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL?.split(",");
+    return adminEmail?.includes(session?.user?.email as string);
+  }, [session?.user]);
+
   const { isMobile } = useCheckViewport();
+  const formattedDate = useMemo(() => {
+    if (content?.start_date && content?.end_date) {
+      const start = parseISO(content.start_date);
+      const end = parseISO(content.end_date);
+
+      if (isSameMonth(start, end)) {
+        return `${format(start, "MMM d")}-${format(end, "d, yyyy")}`;
+      } else {
+        return `${format(start, "MMM d")}-${format(end, "MMM d, yyyy")}`;
+      }
+    }
+  }, [content]);
   return (
     <CardArticle>
       <Box sx={{ flex: 1, padding: ["2.4rem", "4rem"] }}>
@@ -72,7 +94,7 @@ const HackathonCard = ({ content }) => {
               className="mr-2"
               alt="Calendar Icon"
             ></Image>
-            {content.date}
+            {formattedDate}
           </Label>
           <Label>
             {" "}
@@ -87,32 +109,41 @@ const HackathonCard = ({ content }) => {
           </Label>
         </LabelContainer>
         <Box>
-          <Title> {content.name} </Title>
+          <Title> {content.title} </Title>
         </Box>
-        {isMobile && (
-          <img
-            src={content.image}
-            style={{ width: "80%", height: "auto", objectFit: "contain" }}
-            alt="Hackathon"
-            className="mx-auto mb-[1.2rem] block"
-          />
-        )}
-        <Button
-          href={content.url}
-          color="primary"
-          width={isMobile ? "100%" : "25rem"}
-          onClick={() =>
-            sendGAEvent("event", "hackathonClicked", { value: content.name })
-          }
-          disabled={content.buttonDisabled}
-        >
-          {content.buttonText}
-        </Button>
+        <div className="flex items-center gap-4">
+          <Button
+            href={`/event/${content._id}`}
+            color="primary"
+            width={isMobile ? "100%" : "25rem"}
+            onClick={() =>
+              sendGAEvent("event", "hackathonClicked", { value: content.title })
+            }
+            disabled={content.status === "ENDED"}
+          >
+            {content.status}
+          </Button>
+          {isAdmin && (
+            <Button
+              href={`/event/update/${content._id}`}
+              color="secondary"
+              width={isMobile ? "100%" : "25rem"}
+              onClick={() =>
+                sendGAEvent("event", "hackathonClicked", {
+                  value: content.title,
+                })
+              }
+              disabled={content.status === "ENDED"}
+            >
+              Update Event
+            </Button>
+          )}
+        </div>
       </Box>
       {!isMobile && (
         <Box>
           <img
-            src={content.image}
+            src="/images/hackathon/eth-argentina.svg"
             style={{
               height: "100%",
               objectFit: "contain",

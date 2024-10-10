@@ -11,7 +11,6 @@ const IdePage = () => {
   const [completedExercise, setCompletedExercise] = useState<number>(0);
 
   const query = usePathname().split("/")[2].toLowerCase();
-  console.log("query: ", query);
 
   const handleTabChange = (event: SyntheticEvent, newValue: string) => {
     setExercise(newValue);
