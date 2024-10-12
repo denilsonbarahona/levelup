@@ -28,3 +28,18 @@ export const updateEvent = async (
     .put(`/events/update-event/${eventId}`, payload)
     .then((data) => data.data);
 };
+
+export const uploadEventImage = async (
+  eventId: string,
+  File: FormData,
+  Bearer: string,
+) => {
+  const headers = {
+    Authorization: `Bearer ${Bearer}`,
+  };
+  return axios.post(
+    `${process.env.NEXT_PUBLIC_BASE_URL}events/upload-image-event/${eventId}`,
+    File,
+    { headers },
+  );
+};

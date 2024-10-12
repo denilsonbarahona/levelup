@@ -18,8 +18,9 @@ import {
 import Button from "@mui/material/Button";
 import { eventSchema } from "@/utils/zod";
 import { LOCATIONS, EVENT_STATUS, EVENT_ACCESS } from "@/constants";
-import { getEventById, updateEvent } from "@/services/event";
+import { getEventById, updateEvent, uploadEventImage } from "@/services/event";
 import { withAuth } from "@/components/HOC/withAuth";
+import { useSession } from "next-auth/react";
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -45,14 +46,21 @@ const CardArticle = styled("article")(() => ({
 const NewEvent = () => {
   const router = useRouter();
   const pathName = usePathname();
+  const { data: session } = useSession();
   const [isLoading, setIsLoading] = useState(true);
   const [openSnackBar, setOpenSnackBar] = useState(false);
   const [currentEvent, setCurrentEvent] = useState<Event>();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [file, setFile] = useState<any>();
 
   const handleOpenSnackBar = useCallback(() => {
     setOpenSnackBar((prev) => !prev);
   }, [setOpenSnackBar]);
+
+  const handleChangeFile = useCallback((event: any) => {
+    const file = event.target.files ? event.target.files[0] : null;
+    setFile(file);
+  }, []);
 
   const handleOnSubmit = useCallback(
     async (event: FormEvent<HTMLFormElement>) => {
@@ -60,6 +68,9 @@ const NewEvent = () => {
       setIsSubmitting(true);
       const pathParams = pathName.split("/");
       const form = new FormData(event.currentTarget);
+      const formData = new FormData();
+      formData.append("archivo", file);
+
       const payload = {
         title: form.get("title") as string,
         description: form.get("description") as string,
@@ -70,6 +81,8 @@ const NewEvent = () => {
         access: form.get("access") as string,
       };
 
+      console.log(currentEvent?.icon_url, "currentEvent?.icon_url");
+
       eventSchema
         .parseAsync(payload)
         .then(async () => {
@@ -77,7 +90,11 @@ const NewEvent = () => {
             ...currentEvent,
             ...payload,
           } as Event);
-
+          await uploadEventImage(
+            pathParams[3]?.trim(),
+            formData,
+            session?.signedToken as string,
+          );
           router.push(`/event/${pathParams[3]?.trim()}`);
           event?.currentTarget?.reset();
         })
@@ -89,7 +106,7 @@ const NewEvent = () => {
           setIsSubmitting(false);
         });
     },
-    [],
+    [file],
   );
 
   const handleGettingEventById = useCallback(async () => {
@@ -135,19 +152,31 @@ const NewEvent = () => {
               <label className="block text-lg font-medium text-[#1E1E1E]">
                 Banner
               </label>
-              <div className="flex w-fit items-center justify-between gap-4 rounded-[10px] border !border-[#a8a8a8] !bg-[#eeebeb] p-4 text-[#4A4A4A]">
-                <img src="/images/upload.svg" />
-                <div className="grid gap-2">
-                  <p className="text-base font-bold">Add Multimedia</p>
-                  <Button
-                    component="label"
-                    className="w-full !rounded-md !p-2 !text-base"
-                    variant="contained"
-                    role={undefined}
-                  >
-                    Browse Files
-                    <VisuallyHiddenInput type="file" multiple />
-                  </Button>
+              <div className="flex items-center gap-2">
+                <img
+                  src={
+                    file ? URL.createObjectURL(file) : currentEvent?.icon_url
+                  }
+                  className="h-[111px] w-auto"
+                />
+                <div className="flex w-fit items-center justify-between gap-4 rounded-[10px] border !border-[#a8a8a8] !bg-[#eeebeb] p-4 text-[#4A4A4A]">
+                  <img src="/images/upload.svg" />
+                  <div className="grid gap-2">
+                    <p className="text-base font-bold">Add Multimedia</p>
+                    <Button
+                      component="label"
+                      className="w-full !rounded-md !p-2 !text-base"
+                      variant="contained"
+                      role={undefined}
+                    >
+                      Browse Files
+                      <VisuallyHiddenInput
+                        onChange={handleChangeFile}
+                        type="file"
+                        accept="image/png, image/gif, image/jpeg"
+                      />
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>
