@@ -12,3 +12,8 @@ export const eventSchema = z.object({
   status: z.string().min(1, { message: "Status is required" }),
   access: z.string().min(1, { message: "Access is required" }),
 });
+
+export const projectSchema = z.object({
+  title: z.string().min(1, { message: "Title is required" }),
+  event: z.string().min(1, { message: "Event Id is required" }),
+})

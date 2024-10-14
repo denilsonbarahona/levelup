@@ -16,7 +16,7 @@ export const getEvents = async (): Promise<Event[]> => {
 
 export const getEventById = async (eventId: string): Promise<Event> => {
   return apiClient
-    .get(`/events/get-event/${eventId}`)
+    .get(`${process.env.NEXT_PUBLIC_BASE_URL}events/get-event/${eventId}`)
     .then((data) => data.data);
 };
 
