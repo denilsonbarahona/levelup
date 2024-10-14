@@ -141,13 +141,18 @@ const HackathonCard = ({ content }: { content: Event }) => {
         </div>
       </Box>
       {!isMobile && (
-        <Box>
+        <Box
+          style={{
+            height: "311px",
+            width: "auto",
+          }}
+        >
           <img
-            src="/images/hackathon/eth-argentina.svg"
+            src={content?.icon_url}
             style={{
               height: "100%",
-              objectFit: "contain",
               width: "auto",
+              objectFit: "contain",
               objectPosition: "bottom",
             }}
             alt="Hackathon"

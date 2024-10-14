@@ -17,8 +17,9 @@ import {
 import Button from "@mui/material/Button";
 import { eventSchema } from "@/utils/zod";
 import { LOCATIONS, EVENT_STATUS, EVENT_ACCESS } from "@/constants";
-import { createEvent } from "@/services/event";
+import { createEvent, uploadEventImage } from "@/services/event";
 import { withAuth } from "@/components/HOC/withAuth";
+import { useSession } from "next-auth/react";
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -43,18 +44,27 @@ const CardArticle = styled("article")(() => ({
 
 const NewEvent = () => {
   const router = useRouter();
+  const { data: session } = useSession();
   const [openSnackBar, setOpenSnackBar] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [file, setFile] = useState<any>();
 
   const handleOpenSnackBar = useCallback(() => {
     setOpenSnackBar((prev) => !prev);
   }, [setOpenSnackBar]);
+
+  const handleChangeFile = useCallback((event: any) => {
+    const file = event.target.files ? event.target.files[0] : null;
+    setFile(file);
+  }, []);
 
   const handleOnSubmit = useCallback(
     async (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();
       setIsSubmitting(true);
       const form = new FormData(event.currentTarget);
+      const formData = new FormData();
+      formData.append("archivo", file);
       const payload = {
         title: form.get("title"),
         description: form.get("description"),
@@ -69,17 +79,23 @@ const NewEvent = () => {
         .parseAsync(payload)
         .then(async () => {
           const response = await createEvent(payload);
+          await uploadEventImage(
+            response._id,
+            formData,
+            session?.signedToken as string,
+          );
           router.push(`/event/${response._id}`);
           event?.currentTarget?.reset();
         })
-        .catch(() => {
+        .catch((error) => {
+          console.log(error, "error");
           handleOpenSnackBar();
         })
         .finally(() => {
           setIsSubmitting(false);
         });
     },
-    [],
+    [file],
   );
 
   return (
@@ -99,19 +115,31 @@ const NewEvent = () => {
               <label className="block text-lg font-medium text-[#1E1E1E]">
                 Banner
               </label>
-              <div className="flex w-fit items-center justify-between gap-4 rounded-[10px] border !border-[#a8a8a8] !bg-[#eeebeb] p-4 text-[#4A4A4A]">
-                <img src="/images/upload.svg" />
-                <div className="grid gap-2">
-                  <p className="text-base font-bold">Add Multimedia</p>
-                  <Button
-                    component="label"
-                    className="w-full !rounded-md !p-2 !text-base"
-                    variant="contained"
-                    role={undefined}
-                  >
-                    Browse Files
-                    <VisuallyHiddenInput type="file" multiple />
-                  </Button>
+              <div className="flex items-center gap-2">
+                {file && (
+                  <img
+                    src={URL.createObjectURL(file)}
+                    className="h-[111px] w-auto"
+                  />
+                )}
+                <div className="flex w-fit items-center justify-between gap-4 rounded-[10px] border !border-[#a8a8a8] !bg-[#eeebeb] p-4 text-[#4A4A4A]">
+                  <img src="/images/upload.svg" />
+                  <div className="grid gap-2">
+                    <p className="text-base font-bold">Add Multimedia</p>
+                    <Button
+                      component="label"
+                      className="w-full !rounded-md !p-2 !text-base"
+                      variant="contained"
+                      role={undefined}
+                    >
+                      Browse Files
+                      <VisuallyHiddenInput
+                        onChange={handleChangeFile}
+                        type="file"
+                        accept="image/png, image/gif, image/jpeg"
+                      />
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>
