@@ -24,7 +24,7 @@ const EventDetails = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   const getMySubmission = () => {
-    
+
   }
 
   const handleGettingEventById = useCallback(async () => {
@@ -88,7 +88,7 @@ const EventDetails = () => {
             <Rules />
           </TabPanel>
           <TabPanel value="5">
-            <MyProject />
+            <MyProject _event={currentEvent} _submissions={submissions}/>
           </TabPanel>
         </TabContext>
       </Wrapper>

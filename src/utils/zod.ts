@@ -14,6 +14,6 @@ export const eventSchema = z.object({
 });
 
 export const projectSchema = z.object({
-  title: z.string().min(1, { message: "Title is required" }),
+  name: z.string().min(1, { message: "Title is required" }),
   event: z.string().min(1, { message: "Event Id is required" }),
 })

@@ -1,17 +1,23 @@
-import { FormEvent, useCallback, useState } from "react";
+import { FormEvent, useCallback, useEffect, useState } from "react";
 import { Event } from "@/types/events";
-import { Project } from "@/types/project";
+import { Project, Team } from "@/types/project";
 import { Button, CircularProgress, Input } from "@mui/material";
 import { projectSchema } from "@/utils/zod";
 import { createProject } from "@/services/projects";
 
 interface MyProjectProps {
   _event: Event | undefined;
-  _submission: Project | undefined;
+  _submissions: Project[] | undefined;
 }
 
-export const MyProject: React.FC<MyProjectProps> = ({ _event, _submission }) => {
+export const MyProject: React.FC<MyProjectProps> = ({ _event, _submissions }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [myProject, setMyProject] = useState<Project>();
+  const myId = "670493b7cf77398d7337fef4"
+
+  useEffect(() => {
+    getMyProject();
+  }, [])
 
   const handleOnSubmit = useCallback(
     async (event: FormEvent<HTMLFormElement>) => {
@@ -24,13 +30,13 @@ export const MyProject: React.FC<MyProjectProps> = ({ _event, _submission }) => 
       // Retrieve the value of the input with name="project-title"
       const projectTitle = form.get("project-title") as string;
 
-      console.log("Project Title:", projectTitle);
-
       const payload = {
         name: projectTitle,
         event: _event?._id,
-        team: "670493b7cf77398d7337fef4", // TODO: Get user id from DB
+        team: myId, // TODO: Get user id from DB
       };
+
+      console.log("Payload :", payload);
 
       try {
         await projectSchema.parseAsync(payload);
@@ -46,9 +52,29 @@ export const MyProject: React.FC<MyProjectProps> = ({ _event, _submission }) => 
     [_event]
   );
 
+  const getMyProject = () => {
+    let myProject: Team | undefined = undefined;
+
+    _submissions?.forEach((submission) => {
+        console.log("Team ", submission.teamMembers, myId)
+        myProject = submission.teamMembers.find((member) => member._id === myId)
+        console.log("My Proj", myProject)
+    })
+
+    setMyProject(myProject);
+    return myProject;
+  }
+
+  const getTeam = (project: Project) => {
+    let answer = "";
+    answer = project.teamMembers?.map((member) => member.name).join(",")
+
+    return answer;
+    }
+
   return (
     <div className="p-4">
-      {_submission === undefined ? (
+      {myProject === undefined ? (
         <div>
           <h2 className="text-lg font-medium mb-4">You are not participating in this event</h2>
           <form
@@ -74,7 +100,15 @@ export const MyProject: React.FC<MyProjectProps> = ({ _event, _submission }) => 
         </div>
       ) : (
         <ul className="space-y-2">
-          {/* You can render submission details here */}
+          <li
+              key={myProject?._id}
+              className="border p-4 rounded-md shadow-md hover:shadow-lg transition"
+            >
+              <h3 className="text-xl font-semibold">{myProject?.project_name}</h3>
+              <p>Name: {myProject?.project_name}</p>
+              <p>Created At: {new Date(myProject?.createdAt).toLocaleDateString()}</p>
+              <p>Team Members: {getTeam(myProject)}</p>
+            </li>
         </ul>
       )}
     </div>

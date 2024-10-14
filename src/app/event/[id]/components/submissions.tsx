@@ -8,6 +8,14 @@ interface SubmissionsProps {
 
 export const Submissions: React.FC<SubmissionsProps> = ({ event, submissions }) => {
     console.log("submissions", submissions)
+
+    const getTeam = (project: Project) => {
+        let answer = "";
+        answer = project.teamMembers?.map((member) => member.name).join(",")
+
+        return answer;
+    }
+
     return (
     <div className="p-4">
       {submissions === undefined || submissions?.length === 0 ? (
@@ -22,7 +30,7 @@ export const Submissions: React.FC<SubmissionsProps> = ({ event, submissions }) 
               <h3 className="text-xl font-semibold">{project.project_name}</h3>
               <p>Status: {project.status}</p>
               <p>Created At: {new Date(project.createdAt).toLocaleDateString()}</p>
-              <p>Team Members: {project.teamMembers.join(", ")}</p>
+              <p>Team Members: {getTeam(project)}</p>
             </li>
           ))}
         </ul>
