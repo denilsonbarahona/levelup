@@ -16,7 +16,7 @@ import {
 } from "@mui/material";
 import Button from "@mui/material/Button";
 import { eventSchema } from "@/utils/zod";
-import { LOCATIONS, EVENT_STATUS, EVENT_ACCESS } from "@/constants";
+import { LOCATIONS, EVENT_TRACKS, EVENT_ACCESS } from "@/constants";
 import { createEvent, uploadEventImage } from "@/services/event";
 import { withAuth } from "@/components/HOC/withAuth";
 import { useSession } from "next-auth/react";
@@ -230,18 +230,19 @@ const NewEvent = () => {
             </div>
             <div>
               <label className="block text-lg font-medium text-[#1E1E1E]">
-                Status
+                TRACKS
               </label>
               <Select
                 name="status"
                 id="status"
-                defaultValue="UPCOMING"
+                multiple
+                defaultValue={[]}
                 sx={{
                   width: "100%",
                   padding: "0rem",
                 }}
               >
-                {EVENT_STATUS.map((item) => (
+                {EVENT_TRACKS.map((item) => (
                   <MenuItem
                     sx={{ paddingLeft: ["0rem"] }}
                     className="!bg-white"

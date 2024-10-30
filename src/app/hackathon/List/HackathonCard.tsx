@@ -123,7 +123,7 @@ const HackathonCard = ({ content }: { content: Event }) => {
           >
             {content.status}
           </Button>
-          {isAdmin && (
+          {/* {isAdmin && (
             <Button
               href={`/event/update/${content._id}`}
               color="secondary"
@@ -137,7 +137,7 @@ const HackathonCard = ({ content }: { content: Event }) => {
             >
               Update Event
             </Button>
-          )}
+          )} */}
         </div>
       </Box>
       {!isMobile && (

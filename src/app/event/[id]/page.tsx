@@ -1,16 +1,17 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
+import { useSession } from "next-auth/react";
 import { GetServerSideProps } from "next";
 import { Event } from "@/types/events";
 import { useRouter, usePathname } from "next/navigation";
 import SectionHeader from "@/components/SectionHeader";
-import { Tabs, Tab, Box } from "@mui/material";
+import { Tabs, Tab, Box, Snackbar } from "@mui/material";
 import { TabPanel, TabContext, TabList } from "@mui/lab";
 import Wrapper from "@/components/Wrapper";
 import { withAuth } from "@/components/HOC/withAuth";
-import { getEventById } from "@/services/event"; 
-
+import { withOutAuth } from "@/components/HOC/withOutAuth";
+import { getEventById, uploadEventImage, updateEvent } from "@/services/event";
 import { OverView, Prize, MyProject, Rules, Submissions } from "./components";
 import { Project } from "@/types/project";
 import { getProjects } from "@/services/projects";
@@ -22,10 +23,35 @@ const EventDetails = () => {
   const [currentEvent, setCurrentEvent] = useState<Event>();
   const [submissions, setSubmissions] = useState<Project[]>();
   const [isLoading, setIsLoading] = useState(true);
+  const [openSnackBar, setOpenSnackBar] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { data: session } = useSession();
 
-  const getMySubmission = () => {
+  const isAdmin = useMemo(() => {
+    const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL?.split(",");
+    return adminEmail?.includes(session?.user?.email as string);
+  }, [session?.user]);
 
-  }
+  const handleOpenSnackBar = useCallback(() => {
+    setOpenSnackBar((prev) => !prev);
+  }, [setOpenSnackBar]);
+
+  const handleSubmitEdit = useCallback(
+    async (newEvent: Event) => {
+      try {
+        setIsSubmitting(true);
+        const pathParams = pathName.split("/");
+        await updateEvent(pathParams[2]?.trim(), newEvent);
+        const event = await getEventById(pathParams[2]?.trim());
+        setCurrentEvent(event);
+      } catch {
+        handleOpenSnackBar();
+      } finally {
+        setIsSubmitting(false);
+      }
+    },
+    [pathName],
+  );
 
   const handleGettingEventById = useCallback(async () => {
     try {
@@ -43,20 +69,19 @@ const EventDetails = () => {
 
   const handleGetSubmissionsForEvent = useCallback(async () => {
     try {
-      if(!submissions) {
+      if (!submissions) {
         const pathParams = pathName.split("/");
         const payload = {
-          id_event: pathParams[2]?.trim()
+          id_event: pathParams[2]?.trim(),
         };
         const projects = await getProjects(payload);
-        console.log("projects: ", projects)
+        console.log("projects: ", projects);
         setSubmissions(projects);
       }
     } catch {
     } finally {
-      
     }
-  }, [submissions])
+  }, [submissions]);
 
   useEffect(() => {
     handleGettingEventById();
@@ -65,7 +90,10 @@ const EventDetails = () => {
 
   return (
     <div className="mt-[-6.5rem] flex flex-col pb-2.5">
-      <SectionHeader title={currentEvent?.title} url={"/images/podcast-banner.svg"} />
+      <SectionHeader
+        title={currentEvent?.title}
+        url={"/images/podcast-banner.svg"}
+      />
       <Wrapper>
         <TabContext value={tab}>
           <TabList onChange={(_, value) => setTab(value)}>
@@ -76,24 +104,50 @@ const EventDetails = () => {
             <Tab className="!text-base" label="My Project" value="5" />
           </TabList>
           <TabPanel value="1">
-            <OverView event={currentEvent}/>
+            <OverView
+              isAdmin={isAdmin as boolean}
+              isSubmitting={isSubmitting}
+              handleSubmitEdit={handleSubmitEdit}
+              event={currentEvent}
+            />
           </TabPanel>
           <TabPanel value="2">
-            <Prize />
+            <Prize
+              isAdmin={isAdmin as boolean}
+              isSubmitting={isSubmitting}
+              handleSubmitEdit={handleSubmitEdit}
+              event={currentEvent}
+            />
           </TabPanel>
           <TabPanel value="3">
             <Submissions event={currentEvent} submissions={submissions} />
           </TabPanel>
           <TabPanel value="4">
-            <Rules />
+            <Rules
+              isAdmin={isAdmin as boolean}
+              isSubmitting={isSubmitting}
+              handleSubmitEdit={handleSubmitEdit}
+              event={currentEvent}
+            />
           </TabPanel>
           <TabPanel value="5">
-            <MyProject _event={currentEvent} _submissions={submissions}/>
+            <MyProject _event={currentEvent} _submissions={submissions} />
           </TabPanel>
         </TabContext>
       </Wrapper>
+      <Snackbar
+        open={openSnackBar}
+        autoHideDuration={6000}
+        onClose={handleOpenSnackBar}
+        sx={{
+          "& .MuiSnackbarContent-root": {
+            fontSize: "1.5rem",
+          },
+        }}
+        message="Error when update the event"
+      />
     </div>
   );
 };
 
-export default withAuth(EventDetails);
+export default EventDetails;
