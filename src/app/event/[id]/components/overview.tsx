@@ -7,6 +7,11 @@ interface OverViewProps {
 
 export const OverView: React.FC<OverViewProps> = ({ event }) => {
 
+  const canShowTimeline = () =>
+  {
+    return event != undefined && event?.start_date != undefined && event?.end_date != undefined
+  }
+
   console.log("Overview: ", event);
   return (
     <div>
@@ -23,7 +28,7 @@ export const OverView: React.FC<OverViewProps> = ({ event }) => {
         </p>
       </div>
 
-       { event != undefined && (<Timeline startDate={event?.start_date} endDate={event?.end_date} />)}
+       { canShowTimeline() && (<Timeline startDate={event?.start_date!!} endDate={event?.end_date!!} />)}
 
       <h2 className="mt-8 text-lg font-medium">Description</h2>
       <div className="mt-4 grid gap-3">

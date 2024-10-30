@@ -4,6 +4,7 @@ import { Project, Team } from "@/types/project";
 import { Button, CircularProgress, Input } from "@mui/material";
 import { projectSchema } from "@/utils/zod";
 import { createProject } from "@/services/projects";
+import StepperForm from "./stepperform";
 
 interface MyProjectProps {
   _event: Event | undefined;
@@ -76,8 +77,8 @@ export const MyProject: React.FC<MyProjectProps> = ({ _event, _submissions }) =>
     <div className="p-4">
       {myProject === undefined ? (
         <div>
-          <h2 className="text-lg font-medium mb-4">You are not participating in this event</h2>
-          <form
+          <h2 className="text-lg font-medium mb-4">Fill out the form to participate in this event</h2>
+          {/* <form
             onSubmit={handleOnSubmit}
             className="mx-auto grid w-full gap-5 py-5"
           >
@@ -96,7 +97,8 @@ export const MyProject: React.FC<MyProjectProps> = ({ _event, _submissions }) =>
             >
               {isSubmitting ? <CircularProgress /> : "Join Event"}
             </Button>
-          </form>
+          </form> */}
+          <StepperForm />
         </div>
       ) : (
         <ul className="space-y-2">
