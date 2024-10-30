@@ -2,6 +2,10 @@ export interface Event {
   project_id: string[];
   title: string;
   description: string;
+  overview: string;
+  prizes: string;
+  rules: string;
+  evaluation: string;
   start_date: string;
   end_date: string;
   location: string;

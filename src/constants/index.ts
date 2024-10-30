@@ -15,6 +15,8 @@ export const LOCATIONS = [
 
 export const EVENT_STATUS = ["UPCOMING", "OPEN", "ENDED"];
 
+export const EVENT_TRACKS = ["GENERAL", "ZK", "DEFI"];
+
 export const EVENT_ACCESS = ["FREE", "INVITE ONLY"];
 
 export const HACKATHON_DATE_LIST = ["ALL TIME", "UPCOMING", "OPEN", "ENDED"];
