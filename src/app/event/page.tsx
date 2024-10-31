@@ -71,8 +71,12 @@ const NewEvent = () => {
         start_date: form.get("start_date"),
         end_date: form.get("end_date"),
         location: form.get("location"),
-        status: form.get("status"),
+        tracks: form.get("tracks"),
         access: form.get("access"),
+        overview: form.get("overview"),
+        evaluation: form.get("evaluation"),
+        prizes: form.get("prizes"),
+        rules: form.get("rules"),
       };
 
       eventSchema
@@ -165,6 +169,51 @@ const NewEvent = () => {
                 placeholder="Enter Description"
               />
             </div>
+            <div>
+              <label className="block text-lg font-medium text-[#1E1E1E]">
+                Overview
+              </label>
+              <Input
+                name="overview"
+                id="overview"
+                rows={5}
+                className="w-full"
+                placeholder="Enter Overview"
+              />
+            </div>
+            <div>
+              <label className="block text-lg font-medium text-[#1E1E1E]">
+                Evaluation
+              </label>
+              <Input
+                name="evaluation"
+                id="evaluation"
+                className="w-full"
+                placeholder="Enter Evaluation"
+              />
+            </div>
+            <div>
+              <label className="block text-lg font-medium text-[#1E1E1E]">
+                Prizes
+              </label>
+              <Input
+                name="prizes"
+                id="prizes"
+                className="w-full"
+                placeholder="Enter Prizes"
+              />
+            </div>
+            <div>
+              <label className="block text-lg font-medium text-[#1E1E1E]">
+                Rules
+              </label>
+              <Input
+                name="rules"
+                id="rules"
+                className="w-full"
+                placeholder="Enter Rules"
+              />
+            </div>
             <div className="grid items-center gap-5 md:flex">
               <div className="w-full">
                 <label className="block text-lg font-medium text-[#1E1E1E]">
@@ -230,6 +279,17 @@ const NewEvent = () => {
             </div>
             <div>
               <label className="block text-lg font-medium text-[#1E1E1E]">
+                Tracks (comma separated)
+              </label>
+              <Input
+                name="tracks"
+                id="tracks"
+                className="w-full"
+                placeholder="Enter Tracks"
+              />
+            </div>
+            {/* <div>
+              <label className="block text-lg font-medium text-[#1E1E1E]">
                 TRACKS
               </label>
               <Select
@@ -268,7 +328,7 @@ const NewEvent = () => {
                   </MenuItem>
                 ))}
               </Select>
-            </div>
+            </div> */}
             <div>
               <label className="block text-lg font-medium text-[#1E1E1E]">
                 Access
