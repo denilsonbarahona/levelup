@@ -9,11 +9,11 @@ export const eventSchema = z.object({
   start_date: z.string().min(1, { message: "Start date is required" }),
   end_date: z.string().min(1, { message: "End date is required" }),
   location: z.string().min(1, { message: "Location is required" }),
-  status: z.string().min(1, { message: "Status is required" }),
+  tracks: z.string().min(1, { message: "Status is required" }),
   access: z.string().min(1, { message: "Access is required" }),
 });
 
 export const projectSchema = z.object({
   name: z.string().min(1, { message: "Title is required" }),
   event: z.string().min(1, { message: "Event Id is required" }),
-})
+});
