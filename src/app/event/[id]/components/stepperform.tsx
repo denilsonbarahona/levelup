@@ -9,6 +9,7 @@ import {
   Typography,
   CircularProgress,
 } from "@mui/material";
+import { createTheme, ThemeProvider } from '@mui/material/styles'
 
 const steps = ["Profile Info", "Project Details", "Preview"];
 
@@ -31,6 +32,7 @@ const StepperForm = () => {
     projectInfo: "",
     videoLink: "",
   });
+  const [file, setFile] = useState<any>();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleInputChange = (
@@ -65,6 +67,15 @@ const StepperForm = () => {
         return (
           <Box display="flex" flexDirection="column" gap={2}>
             <Typography variant="h6">Personal Info</Typography>
+            <div className="flex justify-center items-center h-[150px] w-[150px] overflow-hidden">
+                {formData.profilePicture && (
+                    <img
+                        src={URL.createObjectURL(formData.profilePicture)}
+                        className="max-h-full max-w-full object-contain"
+                    />
+                )}
+            </div>
+
             <Button variant="contained" component="label">
               Upload Project / Team Picture
               <input
@@ -146,18 +157,27 @@ const StepperForm = () => {
     }
   };
 
+  const stepperTheme = createTheme({
+    components: {
+        MuiStepLabel: {
+            styleOverrides: {
+                label: {
+                    fontSize: '1.5rem',
+                    fontWeight: 'bold',
+                },
+            },
+        },
+    },
+  });
+
   return (
+    // <ThemeProvider theme={stepperTheme}>
     <Box sx={{ width: "50%", margin: "auto", padding: 4 }}>
       {/* Stepper Header */}
       <Stepper activeStep={step} alternativeLabel>
         {steps.map((label, index) => (
           <Step key={index}>
-            <StepLabel
-            sx={{ 
-                fontSize: '20px',
-                fontWeight: 'bold'
-             }}
-            >{label}</StepLabel>
+            <StepLabel>{label}</StepLabel>
           </Step>
         ))}
       </Stepper>
@@ -196,6 +216,7 @@ const StepperForm = () => {
         </Box>
       </form>
     </Box>
+    // </ThemeProvider>
   );
 };
 

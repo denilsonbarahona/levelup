@@ -77,7 +77,7 @@ export const MyProject: React.FC<MyProjectProps> = ({ _event, _submissions }) =>
     <div className="p-4">
       {myProject === undefined ? (
         <div>
-          <h2 className="text-lg font-medium mb-4">Fill out the form to participate in this event</h2>
+          <h2 className="text-lg font-medium mb-4">Enter your project details to participate in this event</h2>
           {/* <form
             onSubmit={handleOnSubmit}
             className="mx-auto grid w-full gap-5 py-5"

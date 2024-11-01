@@ -99,7 +99,7 @@ export const OverView: React.FC<OverViewProps> = ({
         )}
       </div>
 
-      {canShowTimeline() && && (
+      {canShowTimeline() && (
         <Timeline
           handleSubmitStartDate={handleSubmitStartDate}
           handleSubmitEndDate={handleSubmitEndDate}
@@ -108,7 +108,6 @@ export const OverView: React.FC<OverViewProps> = ({
           isSubmitting={isSubmitting}
         />
       )}
-
       <div className="mt-5 flex items-center justify-between">
         <h2 className="text-lg font-medium">Description</h2>
         {isAdmin && (
