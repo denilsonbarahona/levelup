@@ -27,6 +27,7 @@ const handler = NextAuth({
     },
     async session({ session, token }: any) {
       session.user.id = token.id;
+      session.access = token.accessToken;
       const signedToken = jwt.sign(
         { ...session },
         process.env.NEXT_PUBLIC_JWT_SECRET,

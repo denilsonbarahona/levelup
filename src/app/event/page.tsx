@@ -92,7 +92,6 @@ const NewEvent = () => {
           event?.currentTarget?.reset();
         })
         .catch((error) => {
-          console.log(error, "error");
           handleOpenSnackBar();
         })
         .finally(() => {

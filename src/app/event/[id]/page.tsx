@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect, useMemo } from "react";
+import { isAfter, isEqual } from "date-fns";
 import { useSession } from "next-auth/react";
 import { GetServerSideProps } from "next";
 import { Event } from "@/types/events";
@@ -21,11 +22,14 @@ const EventDetails = () => {
 
   const [tab, setTab] = useState("1");
   const [currentEvent, setCurrentEvent] = useState<Event>();
+
   const [submissions, setSubmissions] = useState<Project[]>();
   const [isLoading, setIsLoading] = useState(true);
   const [openSnackBar, setOpenSnackBar] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { data: session } = useSession();
+
+  useEffect(() => {}, [session?.access]);
 
   const isAdmin = useMemo(() => {
     const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL?.split(",");
@@ -75,13 +79,20 @@ const EventDetails = () => {
           id_event: pathParams[2]?.trim(),
         };
         const projects = await getProjects(payload);
-        console.log("projects: ", projects);
         setSubmissions(projects);
       }
     } catch {
     } finally {
     }
   }, [submissions]);
+
+  const ended = useMemo(() => {
+    const end = currentEvent?.end_date
+      ? new Date(currentEvent?.end_date)
+      : new Date();
+
+    return isAfter(end, new Date()) || isEqual(end, new Date());
+  }, [currentEvent]);
 
   useEffect(() => {
     handleGettingEventById();
@@ -99,7 +110,9 @@ const EventDetails = () => {
           <TabList onChange={(_, value) => setTab(value)}>
             <Tab className="!text-base" label="Overview" value="1" />
             <Tab className="!text-base" label="Prizes" value="2" />
-            <Tab className="!text-base" label="Submissions" value="3" />
+            {(isAdmin || ended) && (
+              <Tab className="!text-base" label="Submissions" value="3" />
+            )}
             <Tab className="!text-base" label="Rules" value="4" />
             <Tab className="!text-base" label="My Project" value="5" />
           </TabList>

@@ -81,8 +81,6 @@ const NewEvent = () => {
         access: form.get("access") as string,
       };
 
-      console.log(currentEvent?.icon_url, "currentEvent?.icon_url");
-
       eventSchema
         .parseAsync(payload)
         .then(async () => {

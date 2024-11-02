@@ -46,12 +46,14 @@ export const OverView: React.FC<OverViewProps> = ({
     setEvaluation("");
   };
 
-  const canShowTimeline = () =>
-  {
-    return event != undefined && event?.start_date != undefined && event?.end_date != undefined
-  }
+  const canShowTimeline = () => {
+    return (
+      event != undefined &&
+      event?.start_date != undefined &&
+      event?.end_date != undefined
+    );
+  };
 
-  console.log("Overview: ", event);
   return (
     <div>
       <div className="flex items-center justify-between">

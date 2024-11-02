@@ -11,14 +11,17 @@ interface MyProjectProps {
   _submissions: Project[] | undefined;
 }
 
-export const MyProject: React.FC<MyProjectProps> = ({ _event, _submissions }) => {
+export const MyProject: React.FC<MyProjectProps> = ({
+  _event,
+  _submissions,
+}) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [myProject, setMyProject] = useState<Project>();
-  const myId = "670493b7cf77398d7337fef4"
+  const myId = "670493b7cf77398d7337fef4";
 
   useEffect(() => {
     getMyProject();
-  }, [])
+  }, []);
 
   const handleOnSubmit = useCallback(
     async (event: FormEvent<HTMLFormElement>) => {
@@ -37,8 +40,6 @@ export const MyProject: React.FC<MyProjectProps> = ({ _event, _submissions }) =>
         team: myId, // TODO: Get user id from DB
       };
 
-      console.log("Payload :", payload);
-
       try {
         await projectSchema.parseAsync(payload);
         await createProject(payload);
@@ -47,37 +48,38 @@ export const MyProject: React.FC<MyProjectProps> = ({ _event, _submissions }) =>
         console.error("Validation or submission error:", error);
       } finally {
         setIsSubmitting(false);
-        console.log("Submitted");
       }
     },
-    [_event]
+    [_event],
   );
 
   const getMyProject = () => {
     let myProject: Team | undefined = undefined;
 
     _submissions?.forEach((submission) => {
-        console.log("Team ", submission.teamMembers, myId)
-        myProject = submission.teamMembers.find((member) => member._id === myId)
-        console.log("My Proj", myProject)
-    })
+      console.log("Team ", submission.teamMembers, myId);
+      myProject = submission.teamMembers.find((member) => member._id === myId);
+      console.log("My Proj", myProject);
+    });
 
     setMyProject(myProject);
     return myProject;
-  }
+  };
 
   const getTeam = (project: Project) => {
     let answer = "";
-    answer = project.teamMembers?.map((member) => member.name).join(",")
+    answer = project.teamMembers?.map((member) => member.name).join(",");
 
     return answer;
-    }
+  };
 
   return (
     <div className="p-4">
       {myProject === undefined ? (
         <div>
-          <h2 className="text-lg font-medium mb-4">Enter your project details to participate in this event</h2>
+          <h2 className="mb-4 text-lg font-medium">
+            Enter your project details to participate in this event
+          </h2>
           {/* <form
             onSubmit={handleOnSubmit}
             className="mx-auto grid w-full gap-5 py-5"
@@ -103,14 +105,16 @@ export const MyProject: React.FC<MyProjectProps> = ({ _event, _submissions }) =>
       ) : (
         <ul className="space-y-2">
           <li
-              key={myProject?._id}
-              className="border p-4 rounded-md shadow-md hover:shadow-lg transition"
-            >
-              <h3 className="text-xl font-semibold">{myProject?.project_name}</h3>
-              <p>Name: {myProject?.project_name}</p>
-              <p>Created At: {new Date(myProject?.createdAt).toLocaleDateString()}</p>
-              <p>Team Members: {getTeam(myProject)}</p>
-            </li>
+            key={myProject?._id}
+            className="rounded-md border p-4 shadow-md transition hover:shadow-lg"
+          >
+            <h3 className="text-xl font-semibold">{myProject?.project_name}</h3>
+            <p>Name: {myProject?.project_name}</p>
+            <p>
+              Created At: {new Date(myProject?.createdAt).toLocaleDateString()}
+            </p>
+            <p>Team Members: {getTeam(myProject)}</p>
+          </li>
         </ul>
       )}
     </div>

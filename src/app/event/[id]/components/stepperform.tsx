@@ -1,4 +1,10 @@
-import React, { useState, ChangeEvent, FormEvent } from "react";
+import React, {
+  useState,
+  ChangeEvent,
+  FormEvent,
+  useCallback,
+  useEffect,
+} from "react";
 import {
   Box,
   Button,
@@ -8,8 +14,12 @@ import {
   TextField,
   Typography,
   CircularProgress,
+  Select,
+  MenuItem,
 } from "@mui/material";
-import { createTheme, ThemeProvider } from '@mui/material/styles'
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { useSession } from "next-auth/react";
+import { Repos } from "@/types/project";
 
 const steps = ["Profile Info", "Project Details", "Preview"];
 
@@ -23,6 +33,8 @@ interface FormData {
 }
 
 const StepperForm = () => {
+  const { data: session } = useSession();
+  const [repos, setRepos] = useState<Repos[]>([]);
   const [step, setStep] = useState(0);
   const [formData, setFormData] = useState<FormData>({
     profilePicture: null,
@@ -36,7 +48,7 @@ const StepperForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleInputChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -61,19 +73,44 @@ const StepperForm = () => {
     }, 2000);
   };
 
+  const handleGetRepos = useCallback(async () => {
+    if (session?.access) {
+      try {
+        const res = await fetch("https://api.github.com/user/repos", {
+          headers: {
+            Authorization: `token ${session?.access}`,
+          },
+        });
+        if (!res.ok) {
+          throw new Error("Error fetching repositories");
+        }
+        const data = await res.json();
+        setRepos(data ?? []);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  }, [session?.access]);
+
+  useEffect(() => {
+    handleGetRepos();
+  }, [handleGetRepos]);
+
+  console.log(repos);
+
   const renderStepContent = () => {
     switch (step) {
       case 0:
         return (
           <Box display="flex" flexDirection="column" gap={2}>
             <Typography variant="h6">Personal Info</Typography>
-            <div className="flex justify-center items-center h-[150px] w-[150px] overflow-hidden">
-                {formData.profilePicture && (
-                    <img
-                        src={URL.createObjectURL(formData.profilePicture)}
-                        className="max-h-full max-w-full object-contain"
-                    />
-                )}
+            <div className="flex h-[150px] w-[150px] items-center justify-center overflow-hidden">
+              {formData.profilePicture && (
+                <img
+                  src={URL.createObjectURL(formData.profilePicture)}
+                  className="max-h-full max-w-full object-contain"
+                />
+              )}
             </div>
 
             <Button variant="contained" component="label">
@@ -85,6 +122,38 @@ const StepperForm = () => {
                 accept="image/*"
               />
             </Button>
+
+            <Select
+              sx={{
+                width: "100%",
+                padding: "0rem",
+              }}
+              name="location"
+              id="location"
+            >
+              {repos.map((item) => (
+                <MenuItem
+                  sx={{ paddingLeft: ["0rem"] }}
+                  className="!bg-white"
+                  key={item.id}
+                  value={item.html_url}
+                >
+                  <Box display="flex" paddingInline="24px" alignItems="center">
+                    <Typography
+                      sx={{
+                        fontSize: ["1.6rem", "2rem"],
+                        lineHeight: ["2.4rem", "3.6rem"],
+                        fontWeight: 600,
+                        cursor: "inherit",
+                      }}
+                    >
+                      {item.full_name}
+                    </Typography>
+                  </Box>
+                </MenuItem>
+              ))}
+            </Select>
+
             <TextField
               name="name"
               label="Name"
@@ -159,14 +228,14 @@ const StepperForm = () => {
 
   const stepperTheme = createTheme({
     components: {
-        MuiStepLabel: {
-            styleOverrides: {
-                label: {
-                    fontSize: '1.5rem',
-                    fontWeight: 'bold',
-                },
-            },
+      MuiStepLabel: {
+        styleOverrides: {
+          label: {
+            fontSize: "1.5rem",
+            fontWeight: "bold",
+          },
         },
+      },
     },
   });
 
