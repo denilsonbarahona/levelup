@@ -14,14 +14,15 @@ import { withAuth } from "@/components/HOC/withAuth";
 import { withOutAuth } from "@/components/HOC/withOutAuth";
 import { getEventById, uploadEventImage, updateEvent } from "@/services/event";
 import { OverView, Prize, MyProject, Rules, Submissions } from "./components";
-import { Project } from "@/types/project";
-import { getProjects } from "@/services/projects";
+import { Project, User } from "@/types/project";
+import { getProjects, getUsers } from "@/services/projects";
 
 const EventDetails = () => {
   const pathName = usePathname();
 
   const [tab, setTab] = useState("1");
   const [currentEvent, setCurrentEvent] = useState<Event>();
+  const [userList, setUserList] = useState<User[]>();
 
   const [submissions, setSubmissions] = useState<Project[]>();
   const [isLoading, setIsLoading] = useState(true);
@@ -63,8 +64,16 @@ const EventDetails = () => {
       if (!currentEvent) {
         const pathParams = pathName.split("/");
         const event = await getEventById(pathParams[2]?.trim());
+        console.log("Got Event:", event);
         setCurrentEvent(event);
       }
+
+      if(!userList) {
+        const response = await getUsers();
+        console.log("Got Users: ", response);
+        setUserList(response.users);
+      }
+
     } catch {
     } finally {
       setIsLoading(false);
@@ -144,7 +153,7 @@ const EventDetails = () => {
             />
           </TabPanel>
           <TabPanel value="5">
-            <MyProject _event={currentEvent} _submissions={submissions} />
+            <MyProject _event={currentEvent} _submissions={submissions} _userList={userList}/>
           </TabPanel>
         </TabContext>
       </Wrapper>

@@ -1,6 +1,6 @@
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import { Event } from "@/types/events";
-import { Project, Team } from "@/types/project";
+import { Project, User } from "@/types/project";
 import { Button, CircularProgress, Input } from "@mui/material";
 import { projectSchema } from "@/utils/zod";
 import { createProject } from "@/services/projects";
@@ -9,12 +9,15 @@ import StepperForm from "./stepperform";
 interface MyProjectProps {
   _event: Event | undefined;
   _submissions: Project[] | undefined;
+  _userList: User[];
 }
 
 export const MyProject: React.FC<MyProjectProps> = ({
   _event,
   _submissions,
+  _userList
 }) => {
+  
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [myProject, setMyProject] = useState<Project>();
   const myId = "670493b7cf77398d7337fef4";
@@ -54,6 +57,10 @@ export const MyProject: React.FC<MyProjectProps> = ({
   );
 
   const getMyProject = () => {
+    
+    console.log("Event:", _event);
+    console.log("Submissions", _submissions);
+
     let myProject: Team | undefined = undefined;
 
     _submissions?.forEach((submission) => {
@@ -73,6 +80,11 @@ export const MyProject: React.FC<MyProjectProps> = ({
     return answer;
   };
 
+  const getMyUser = (list: User[], id:string) => {
+    if(list)
+      return list.find(user => user._id === id);
+  }
+
   return (
     <div className="p-4">
       {myProject === undefined ? (
@@ -80,27 +92,7 @@ export const MyProject: React.FC<MyProjectProps> = ({
           <h2 className="mb-4 text-lg font-medium">
             Enter your project details to participate in this event
           </h2>
-          {/* <form
-            onSubmit={handleOnSubmit}
-            className="mx-auto grid w-full gap-5 py-5"
-          >
-            <Input
-              name="project-title"
-              id="project-title"
-              className="w-full"
-              defaultValue=""
-              placeholder="Project Title"
-            />
-            <Button
-              disabled={isSubmitting}
-              className="mt-4 rounded-2xl bg-[#ff684b] px-20 py-2 text-3xl text-white"
-              variant="contained"
-              type="submit"
-            >
-              {isSubmitting ? <CircularProgress /> : "Join Event"}
-            </Button>
-          </form> */}
-          <StepperForm />
+          <StepperForm _event={_event} userList={_userList} myUser={getMyUser(_userList, myId)} />
         </div>
       ) : (
         <ul className="space-y-2">

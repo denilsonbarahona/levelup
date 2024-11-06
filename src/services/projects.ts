@@ -1,6 +1,6 @@
 import axios from "axios";
 import { apiClient } from "@/utils/axios";
-import { Project } from "@/types/project";
+import { Project, User } from "@/types/project";
 
 export const createProject = async (payload): Promise<Project> => {
   return apiClient
@@ -12,5 +12,11 @@ export const getProjects = async (payload): Promise<Project[]> => {
     console.log("payload: ", payload);
   return apiClient
     .post(`${process.env.NEXT_PUBLIC_BASE_URL}projects/get-projects`, payload)
+    .then((data) => data.data);
+};
+
+export const getUsers = async(): Promise<User[]> => {
+  return apiClient
+    .get(`${process.env.NEXT_PUBLIC_BASE_URL}users/get-users`)
     .then((data) => data.data);
 };

@@ -16,6 +16,7 @@ export interface Event {
   projectDetails: string[];
   __v: number;
   icon_url?: string;
+  tracks: string[];
 }
 
 export interface EventResponse {

@@ -46,14 +46,6 @@ export const OverView: React.FC<OverViewProps> = ({
     setEvaluation("");
   };
 
-  const canShowTimeline = () => {
-    return (
-      event != undefined &&
-      event?.start_date != undefined &&
-      event?.end_date != undefined
-    );
-  };
-
   return (
     <div>
       <div className="flex items-center justify-between">
@@ -101,15 +93,16 @@ export const OverView: React.FC<OverViewProps> = ({
         )}
       </div>
 
-      {canShowTimeline() && (
+      {event != undefined && (
         <Timeline
           handleSubmitStartDate={handleSubmitStartDate}
           handleSubmitEndDate={handleSubmitEndDate}
-          startDate={event?.start_date!!}
-          endDate={event?.end_date!!}
+          startDate={event?.start_date}
+          endDate={event?.end_date}
           isSubmitting={isSubmitting}
         />
       )}
+
       <div className="mt-5 flex items-center justify-between">
         <h2 className="text-lg font-medium">Description</h2>
         {isAdmin && (

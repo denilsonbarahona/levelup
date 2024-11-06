@@ -4,18 +4,19 @@ export interface Project {
   project_name: string;
   status: string;
   createdAt: string;
-  teamMembers: Team[];
+  teamMembers: User[];
   //TODO: EventInfo schema
   //eventInfo
 }
 
-export interface Team {
+export interface User {
   avatarUrl: string;
   createdAt: string;
   githubId: string;
   isAdmin: boolean;
   name: string;
   _id: string;
+  email: string;
 }
 
 export interface ProjectResponse {
