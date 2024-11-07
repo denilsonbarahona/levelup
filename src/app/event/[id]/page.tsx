@@ -100,7 +100,7 @@ const EventDetails = () => {
       ? new Date(currentEvent?.end_date)
       : new Date();
 
-    return isAfter(end, new Date()) || isEqual(end, new Date());
+    return isAfter(new Date(), end) || isEqual(new Date(), end);
   }, [currentEvent]);
 
   useEffect(() => {
