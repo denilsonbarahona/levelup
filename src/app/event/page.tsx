@@ -83,11 +83,13 @@ const NewEvent = () => {
         .parseAsync(payload)
         .then(async () => {
           const response = await createEvent(payload);
-          await uploadEventImage(
-            response._id,
-            formData,
-            session?.signedToken as string,
-          );
+          if (file) {
+            await uploadEventImage(
+              response._id,
+              formData,
+              session?.signedToken as string,
+            );
+          }
           router.push(`/event/${response._id}`);
           event?.currentTarget?.reset();
         })
@@ -148,23 +150,25 @@ const NewEvent = () => {
             </div>
             <div>
               <label className="block text-lg font-medium text-[#1E1E1E]">
-                Title
+                Title *
               </label>
               <Input
                 name="title"
                 id="title"
+                required
                 className="w-full"
                 placeholder="Enter title"
               />
             </div>
             <div>
               <label className="block text-lg font-medium text-[#1E1E1E]">
-                Description
+                Description *
               </label>
               <Input
                 name="description"
                 id="description"
                 className="w-full"
+                required
                 placeholder="Enter Description"
               />
             </div>
@@ -216,23 +220,25 @@ const NewEvent = () => {
             <div className="grid items-center gap-5 md:flex">
               <div className="w-full">
                 <label className="block text-lg font-medium text-[#1E1E1E]">
-                  Start date
+                  Start date *
                 </label>
                 <Input
                   name="start_date"
                   id="start_date"
                   type="date"
+                  required
                   className="w-full"
                 />
               </div>
               <div className="w-full">
                 <label className="block text-lg font-medium text-[#1E1E1E]">
-                  End date
+                  End date *
                 </label>
                 <Input
                   name="end_date"
                   id="end_date"
                   type="date"
+                  required
                   className="w-full"
                 />
               </div>
@@ -278,11 +284,12 @@ const NewEvent = () => {
             </div>
             <div>
               <label className="block text-lg font-medium text-[#1E1E1E]">
-                Tracks (comma separated)
+                Tracks (comma separated) *
               </label>
               <Input
                 name="tracks"
                 id="tracks"
+                required
                 className="w-full"
                 placeholder="Enter Tracks"
               />

@@ -121,7 +121,7 @@ const HackathonCard = ({ content }: { content: Event }) => {
             }
             disabled={content.status === "ENDED"}
           >
-            {content.status}
+            Continue
           </Button>
           {/* {isAdmin && (
             <Button
@@ -151,7 +151,7 @@ const HackathonCard = ({ content }: { content: Event }) => {
             src={content?.icon_url}
             style={{
               height: "100%",
-              width: "auto",
+              width: "307px",
               objectFit: "contain",
               objectPosition: "bottom",
             }}
