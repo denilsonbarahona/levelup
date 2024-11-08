@@ -5,8 +5,9 @@ export interface Project {
   status: string;
   createdAt: string;
   teamMembers: User[];
-  //TODO: EventInfo schema
-  //eventInfo
+  description: string;
+  tracks: string[];
+  project_picture: string;
 }
 
 export interface User {

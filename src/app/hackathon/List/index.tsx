@@ -48,6 +48,7 @@ const List = () => {
   const handleGetEvents = useCallback(async () => {
     try {
       const events = await getEvents();
+      events.sort((a, b) => new Date(b.start_date).getTime() - new Date(a.start_date).getTime());
       setEventData(events);
       setFilteredData(events);
     } catch {
@@ -56,14 +57,16 @@ const List = () => {
   }, []);
 
   useEffect(() => {
-    const levelInfo = EventsData.filter((item) => {
+    const levelInfo = EventsData
+    .filter((item) => {
       return (
         (item.status?.includes(dateParams.level) ||
           dateParams.level === "ALL TIME") &&
         (item.location?.includes(regionParams.level) ||
           regionParams.level === "All regions")
       );
-    });
+    })
+    console.log(levelInfo);
     setFilteredData(levelInfo);
   }, [dateParams, regionParams]);
 

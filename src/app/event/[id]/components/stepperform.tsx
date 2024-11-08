@@ -21,13 +21,14 @@ import {
 } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useSession } from "next-auth/react";
-import { Repos } from "@/types/project";
+import { Project, Repos } from "@/types/project";
 import { Event } from "@/types/events";
 import { User } from "@/types/project";
 import TeamMemberCard from "./teamMemberCard";
 import { createProject } from "@/services/projects";
+import { CheckCircleOutline } from "@mui/icons-material";
 
-const steps = ["Project Info", "Project Details", "Preview"];
+const steps = ["Project Info", "Project Details", "Preview", "Confirmation"];
 
 interface FormData {
   projectPicture: File | null;
@@ -45,9 +46,10 @@ interface StepperFormProps {
   _event: Event | undefined;
   userList: User[];
   myUser: User;
+  handleSubmitProject: (event: Project) => void;
 }
 
-const StepperForm: React.FC<StepperFormProps> = ({ _event, userList, myUser }) => {
+const StepperForm: React.FC<StepperFormProps> = ({ _event, userList, myUser, handleSubmitProject }) => {
   const { data: session } = useSession();
   const [repos, setRepos] = useState<Repos[]>([]);
   const [step, setStep] = useState(0);
@@ -90,17 +92,22 @@ const StepperForm: React.FC<StepperFormProps> = ({ _event, userList, myUser }) =
     }
   };
 
-  const handleNext = () => setStep((prevStep) => prevStep + 1);
+  const handleNext = () => {
+    handleSetTeam();
+    setStep((prevStep) => prevStep + 1)
+  };
   const handleBack = () => setStep((prevStep) => prevStep - 1);
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSetTeam = () => {
     const teamIds = teamMembers.map(member => member._id);
     setFormData({...formData, team: teamIds})
+  };
 
+  const handleSubmit = async (e: FormEvent) => {
     console.log("!FORM", formData);
     e.preventDefault();
     const newErrors = {
-      name: formData.name === "",
+      name: formData.name === "", 
       description: formData.description === "",
       comment: formData.comment === "",
       shortDescription: formData.shortDescription === "",
@@ -116,7 +123,7 @@ const StepperForm: React.FC<StepperFormProps> = ({ _event, userList, myUser }) =
       const payload = {
         event: _event?._id,
         name: formData.name,
-        teamMembers: formData.team,
+        team: formData.team,
         description: formData.description,
         github: formData.github,
         tracks: formData.tracks,
@@ -124,8 +131,16 @@ const StepperForm: React.FC<StepperFormProps> = ({ _event, userList, myUser }) =
         shortDescription: formData.shortDescription,
         pictureUrl: formData.projectPicture
       }
-      const response = await createProject(payload)
-      console.log("Form submitted successfully", response);
+
+      try {
+        const response = await createProject(payload)  
+        console.log("Form submitted successfully - ", response);
+        setStep(3);
+        handleSubmitProject(response);
+        
+      } catch (error) {
+        setIsSubmitting(false);
+      }
       setIsSubmitting(false);
     }
   };
@@ -424,12 +439,24 @@ const StepperForm: React.FC<StepperFormProps> = ({ _event, userList, myUser }) =
               <Box display="flex" flexDirection="column" gap={1}>
                 {teamMembers.map((member, index) => (
                   <Box key={index} display="flex" flexDirection="column" p={2} sx={{ border: '1px solid #ddd', borderRadius: 1 }}>
-                    <Typography variant="body1"><strong>Name:</strong> {member.name}</Typography>
-                    <Typography variant="body2" color="textSecondary"><strong>Email:</strong> {member.email}</Typography>
+                    <Typography variant="body1"><strong>Name:</strong> {member ? member.name : ""}</Typography>
+                    <Typography variant="body2" color="textSecondary"><strong>Email:</strong> {member ? member.email : ""}</Typography>
                   </Box>
                 ))}
               </Box>
             </Box>
+          </Box>
+        );
+      case 3:
+        return (
+          <Box display="flex" flexDirection="column" alignItems="center" gap={2}>
+            <CheckCircleOutline sx={{ fontSize: 64, color: "green" }} />
+            <Typography variant="h5" align="center">
+              Submission Successful!
+            </Typography>
+            <Typography variant="body1" align="center">
+              Your project has been uploaded successfully.
+            </Typography>
           </Box>
         );
       default:
@@ -449,11 +476,11 @@ const StepperForm: React.FC<StepperFormProps> = ({ _event, userList, myUser }) =
       </Stepper>
 
       {/* Step Content */}
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSetTeam}>
         <Box sx={{ marginTop: 4 }}>{renderStepContent()}</Box>
 
         {/* Navigation Buttons */}
-        <Box
+        {(step < steps.length - 1) && (<Box
           display="flex"
           justifyContent="space-between"
           sx={{ marginTop: 4 }}
@@ -463,15 +490,15 @@ const StepperForm: React.FC<StepperFormProps> = ({ _event, userList, myUser }) =
               Back
             </Button>
           )}
-          {step < steps.length - 1 ? (
+          {step < steps.length - 2 ? (
             <Button variant="contained" onClick={handleNext}>
               Next
             </Button>
           ) : (
               <Button
-                type="submit"
                 variant="contained"
                 disabled={isSubmitting}
+                onClick={handleSubmit}
                 startIcon={
                   isSubmitting ? <CircularProgress size={20} /> : undefined
                 }
@@ -479,7 +506,7 @@ const StepperForm: React.FC<StepperFormProps> = ({ _event, userList, myUser }) =
                 {isSubmitting ? "Submitting..." : "Submit"}
               </Button>
           )}
-        </Box>
+        </Box>)}
       </form>
       <br></br>
       <br></br>

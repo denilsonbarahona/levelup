@@ -1,3 +1,5 @@
+import { Project } from "./project";
+
 export interface Event {
   project_id: string[];
   title: string;
@@ -13,7 +15,7 @@ export interface Event {
   access: string;
   _id: string;
   createdAt: string;
-  projectDetails: string[];
+  projectDetails: Project[];
   __v: number;
   icon_url?: string;
   tracks: string[];

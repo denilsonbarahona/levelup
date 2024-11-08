@@ -41,6 +41,14 @@ const EventDetails = () => {
     setOpenSnackBar((prev) => !prev);
   }, [setOpenSnackBar]);
 
+  const handleSubmitProject = (newProject: Project) => {
+    console.log("Setting current Event");
+      setCurrentEvent((prevEvent) => ({
+        ...prevEvent!,
+        projectDetails: [...prevEvent!.projectDetails, newProject]
+      }));
+  }
+
   const handleSubmitEdit = useCallback(
     async (newEvent: Event) => {
       try {
@@ -123,7 +131,9 @@ const EventDetails = () => {
               <Tab className="!text-base" label="Submissions" value="3" />
             )}
             <Tab className="!text-base" label="Rules" value="4" />
-            <Tab className="!text-base" label="My Project" value="5" />
+            { (session !== null && !ended) &&
+              (<Tab className="!text-base" label="My Project" value="5" />)
+            }
           </TabList>
           <TabPanel value="1">
             <OverView
@@ -153,7 +163,10 @@ const EventDetails = () => {
             />
           </TabPanel>
           <TabPanel value="5">
-            <MyProject _event={currentEvent} _submissions={submissions} _userList={userList}/>
+            <MyProject _event={currentEvent} 
+            _submissions={submissions} 
+            _userList={userList}
+            handleSubmitProject={handleSubmitProject} />
           </TabPanel>
         </TabContext>
       </Wrapper>

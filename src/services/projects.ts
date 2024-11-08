@@ -5,7 +5,7 @@ import { Project, User } from "@/types/project";
 export const createProject = async (payload): Promise<Project> => {
   return apiClient
     .post(`${process.env.NEXT_PUBLIC_BASE_URL}projects/register-project`, payload)
-    .then((data) => data.data.event);
+    .then((data) => data.data.project);
 };
 
 export const getProjects = async (payload): Promise<Project[]> => {

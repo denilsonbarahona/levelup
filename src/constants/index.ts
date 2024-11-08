@@ -11,6 +11,7 @@ export const LOCATIONS = [
   "Asia/Singapore",
   "Australia/Sydney",
   "America/Mexico_City",
+  "America/Buenos Aires",
 ];
 
 export const EVENT_STATUS = ["UPCOMING", "OPEN", "ENDED"];
